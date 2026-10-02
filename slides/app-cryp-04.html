@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Killian O’Brien">
+  <meta name="author" content="6G6Z0024 Applied Cryptography 2023/24">
+  <title>Finite fields for the Advanced Encryption Standard (AES)</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="../reveal.js/dist/reset.css">
+  <link rel="stylesheet" href="../reveal.js/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="../reveal.js/dist/theme/killian.css" id="theme">
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" data-background-color="rgb(0,47,108)" data-background-image="logowhite.png" data-background-position="95% 5%" data-background-repeat="no-repeat" data-background-size="18%">
+  <h1 class="title">Finite fields for the Advanced Encryption Standard (AES)</h1>
+  <p class="author">Killian O’Brien</p>
+  <p class="author">6G6Z0024 Applied Cryptography 2023/24</p>
+  <p class="date">Lecture Week 03 – Mon 23 October 2023</p>
+</section>
+
+<section id="introduction" class="slide level2">
+<h2>Introduction</h2>
+<ul>
+<li>Cryptography relies heavily on mathematics</li>
+<li>The notion of <strong>finite fields</strong> and <strong>modular polynomial arithmetic</strong> important in ciphers like AES and Elipptic Curves.</li>
+<li>These mathematical systems provide the security and operational requirement needed by the ciphers.</li>
+</ul>
+</section>
+<section id="hierarchy-of-algebraic-systems" class="slide level2">
+<h2>Hierarchy of algebraic systems</h2>
+<h4 id="the-familiar-system-mathbbr-cdot">The familiar system <span class="math inline">\((\mathbb{R}, + , \cdot)\)</span></h4>
+<ul>
+<li>Consider the set of real numbers <span class="math inline">\(\mathbb{R}\)</span></li>
+<li><span class="math inline">\(\mathbb{R}\)</span> can be thought of as consisting of every number on the <em>real number line</em>, a line extending from <span class="math inline">\(-\infty\)</span> to <span class="math inline">\(+\infty\)</span>.</li>
+<li>Real numbers <span class="math inline">\(x\)</span> can be written down as numbers with a (potentially infinite) decimal expansion.</li>
+<li>The real numbers, together with the usual operations of addition, <span class="math inline">\(+\)</span>, and multiplication, <span class="math inline">\(\cdot\)</span>, have the structure of what mathematicians call a <strong>field</strong>.</li>
+<li>That is the system <span class="math inline">\((\mathbb{R}, +, \cdot)\)</span> satisfies the following properties.
+<ul>
+<li><strong>(A1)</strong> <em>Closure for addition:</em> If <span class="math inline">\(a,b \in \mathbb{R}\)</span> then <span class="math inline">\(a+b \in \mathbb{R}\)</span>.</li>
+<li><strong>(A2)</strong> <em>Associativity for addition:</em> For all <span class="math inline">\(a,b,c \in \mathbb{R}\)</span> we have <span class="math inline">\((a+b)+c = a+(b+c)\)</span>.</li>
+<li><strong>(A3)</strong> <em>Additive identity element:</em> There is an element <span class="math inline">\(0 \in \mathbb{R}\)</span> such that for all <span class="math inline">\(a \in \mathbb{R}\)</span> we have <span class="math inline">\(a+0 = 0 + a = a\)</span>.</li>
+<li><strong>(A4)</strong> <em>Additive inverses:</em> For each <span class="math inline">\(a \in \mathbb{R}\)</span> there exists an element <span class="math inline">\(b \in \mathbb{R}\)</span> such that <span class="math inline">\(a+b = b+ a =0\)</span>. This element <span class="math inline">\(b\)</span> is of course the <em>negative of <span class="math inline">\(a\)</span></em> and usually written as <span class="math inline">\(b = -a\)</span>.</li>
+<li><strong>(A5)</strong> <em>Commutativity of addition:</em> For all <span class="math inline">\(a,b \in \mathbb{R}\)</span> we have <span class="math inline">\(a+b= b+a\)</span>.</li>
+</ul></li>
+<li>A system <span class="math inline">\((S,+)\)</span> satisfying (A1) - (A4) is called a <strong>group</strong>, and if it also satisfies (A5) it is called an <strong>abelian group</strong>.</li>
+</ul>
+</section>
+<section id="hierarchy-of-algebraic-systems-1" class="slide level2">
+<h2>Hierarchy of algebraic systems</h2>
+<h4 id="the-familiar-system-mathbbr-cdot-1">The familiar system <span class="math inline">\((\mathbb{R}, + , \cdot)\)</span></h4>
+<ul>
+<li>The system also satisfies
+<ul>
+<li><strong>(M1)</strong> <em>Closure for multiplication:</em> If <span class="math inline">\(a,b \in \mathbb{R}\)</span> then <span class="math inline">\(a\cdot b \in \mathbb{R}\)</span>.</li>
+<li><strong>(M2)</strong> <em>Associativity for multiplication:</em> For all <span class="math inline">\(a,b,c \in \mathbb{R}\)</span> we have <span class="math inline">\((a\cdot b)\cdot c = a\cdot (b\cdot c)\)</span>.</li>
+<li><strong>(M3)</strong> <em>Distributive laws:</em>
+<ul>
+<li>for all <span class="math inline">\(a,b,c \in \mathbb{R}\)</span> we have <span class="math inline">\(a \cdot (b+c) = a \cdot b + a \cdot c\)</span>.</li>
+<li>for all <span class="math inline">\(a,b,c \in \mathbb{R}\)</span> we have <span class="math inline">\((b+c)\cdot a = b \cdot a + c \cdot a\)</span>.</li>
+</ul></li>
+<li><strong>(M4)</strong> <em>Commutativity of multiplication:</em> For all <span class="math inline">\(a,b \in \mathbb{R}\)</span> we have <span class="math inline">\(a\cdot b= b\cdot a\)</span>.</li>
+<li><strong>(M5)</strong> <em>Multiplciative identity:</em> There is an element <span class="math inline">\(1 \in \mathbb{R}\)</span> such that for all <span class="math inline">\(a \in \mathbb{R}\)</span> we have <span class="math inline">\(a\cdot 1 = 1 \cdot a = a\)</span>.</li>
+<li><strong>(M6)</strong> <em>No zero-divisors:</em> If <span class="math inline">\(a,b \in \mathbb{R}\)</span> and <span class="math inline">\(a \cdot b = 0\)</span> then <span class="math inline">\(a=0\)</span> or <span class="math inline">\(b=0\)</span>.</li>
+</ul></li>
+<li>A system <span class="math inline">\((S,+, \cdot)\)</span> satisfying (A1) - (A4) and (M1)-(M3) is called a <strong>ring</strong>, and if it also satisfies (M4) it is called an <strong>abelian ring</strong>.</li>
+<li>A system <span class="math inline">\((S,+, \cdot)\)</span> satisfying (A1) - (A4) and (M1)-(M6) is called an <strong>integral domain</strong>.</li>
+<li>Finally,
+<ul>
+<li><strong>(M7)</strong> <em>Multiplicative inverses:</em> If <span class="math inline">\(a \in \mathbb{R}\)</span> and <span class="math inline">\(a \neq 0\)</span> then there exists an element <span class="math inline">\(b \in \mathbb{R}\)</span> such that <span class="math inline">\(a\cdot b = b \cdot a = 1\)</span>. This element <span class="math inline">\(b\)</span> is of course the <em>reciprocal of <span class="math inline">\(a\)</span></em> and usually written as <span class="math inline">\(b = a^{-1}\)</span>.</li>
+</ul></li>
+<li>A system <span class="math inline">\((F,+, \cdot)\)</span> satisfying (A1) - (A4) and (M1)-(M7) is called a <strong>field</strong>.</li>
+</ul>
+</section>
+<section id="fields" class="slide level2">
+<h2>Fields</h2>
+<ul>
+<li>Essentially, a field <span class="math inline">\((F,+, \cdot)\)</span> is a system within which we can perform addition, subtraction, multiplication and division, without leaving the set <span class="math inline">\(F\)</span>, and the usual proeprties we are familiar with, from <span class="math inline">\(\mathbb{R}\)</span> say, hold true.</li>
+<li>Subtraction and division are defined interms of addition and multiplication as
+<ul>
+<li><span class="math inline">\(a - b = a + (-b)\)</span></li>
+<li><span class="math inline">\(a/b = a \cdot b^{-1}\)</span></li>
+</ul></li>
+<li>Fields provide a mathematical system in which we have a rich calculation environment following well understood rules.</li>
+<li>They, and other related agebraic structures, are of intense interest for their purely mathematical properties ….</li>
+<li>… and also find applications in other mathematical areas such as geometry, and more practical application areas such as cryptography and computer science.</li>
+</ul>
+</section>
+<section id="finite-fields-of-the-form-textgfp" class="slide level2">
+<h2>Finite fields of the form <span class="math inline">\(\text{GF}(p)\)</span></h2>
+<ul>
+<li><p><span class="math inline">\(\text{GF}( m )\)</span> notation named for <em>Galois Field</em> after French mathematician Évariste Galois. It stands for a finite field containing <span class="math inline">\(m\)</span> elements.</p></li>
+<li><p>In cryptography, two of the important finite fields are <span class="math inline">\(\text{GF}(2)\)</span> and, more generally, <span class="math inline">\(\text{GF}(p)\)</span>, for a prime <span class="math inline">\(p\)</span>.</p></li>
+<li><p><span class="math inline">\(\text{GF}(2)\)</span>: This just consits of the binary elements <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span>, under the following rules.</p></li>
+</ul>
+<p><img src="./images/GF2.png" alt="Stallings" style="padding:5spx;width:70%;"></p>
+</section>
+<section id="finite-fields-of-the-form-textgfp-1" class="slide level2">
+<h2>Finite fields of the form <span class="math inline">\(\text{GF}(p)\)</span></h2>
+<ul>
+<li><img src="./images/Z8Z7.png" alt="Stallings" style="padding:5spx;height:100%;float:right;"> A finite field <span class="math inline">\(\text{GF}(p)\)</span> can be formed by our familiar modular arithmetic modulo <span class="math inline">\(p\)</span>, i.e. <span class="math inline">\(\text{GF}(p) = \mathbb{Z}_p\)</span>.</li>
+<li>Table to the right show the operation and inverse tables for <span class="math inline">\(\mathbb{Z}_7\)</span>.</li>
+<li>Note that <span class="math inline">\(\mathbb{Z}_m\)</span>, where <span class="math inline">\(m\)</span> is not a prime, will not be a field due to the lack of multiplicative inverses for all elements.</li>
+<li>For example, consider the operation and inverse tables of <span class="math inline">\(\mathbb{Z}_8\)</span> shown on the right.</li>
+<li>Finding mutliplicative inverses in <span class="math inline">\(\text{GF}(p) = \mathbb{Z}_p\)</span>:
+<ul>
+<li>If <span class="math inline">\(p\)</span> is a prime and <span class="math inline">\(1 \leq a \lt p\)</span> then necessarily <span class="math inline">\(\gcd(a,p)=1\)</span>.</li>
+<li>Run the extended Euclidean algorithm to find integers <span class="math inline">\(x,y\)</span> such that <span class="math display">\[ ax + py = \gcd(a,p) = 1.\]</span></li>
+<li>Then reducing this equation modulo <span class="math inline">\(p\)</span> gives <span class="math display">\[ax \equiv 1 \pmod{p},\]</span> so <span class="math inline">\(a^{-1} = (x \, \,\text{mod} \,\, p)\)</span>.</li>
+</ul></li>
+</ul>
+</section>
+<section id="polynomial-arithmetic" class="slide level2">
+<h2>Polynomial arithmetic</h2>
+<ul>
+<li><p>So for <span class="math inline">\(\text{GF}(p)\)</span> we have a model <span class="math inline">\(\mathbb{Z}_p\)</span>. But what about <span class="math inline">\(\text{GF}(m)\)</span> for other useful values of <span class="math inline">\(m\)</span> such as <span class="math inline">\(m = 2^n\)</span>?</p></li>
+<li><p>For this we will need <strong>polynomial arithmetic</strong>.</p></li>
+<li><p>A <strong>polynomial of degree <span class="math inline">\(n\)</span></strong> is a function <span class="math inline">\(f(x)\)</span> of the form <span class="math display">\[f(x) = a_n x^n + a_{n-1} x^{n-1} + \dots + a_1 x + a_0 = \sum_{i=0}^n a_i x^i.\]</span></p></li>
+<li><p>The coefficients <span class="math inline">\(a_i\)</span> will be coming from some specified set such as the integers <span class="math inline">\(\mathbb{Z}\)</span>, modular integers <span class="math inline">\(\mathbb{Z}_m\)</span> or some finite field.</p></li>
+<li><p>We will be interested in the polynomial object <span class="math inline">\(f\)</span> itself, not so much in its particular values. So the <span class="math inline">\(x\)</span> will remain mostly unspecified, or <em>indetermined</em>.</p></li>
+<li><p><img src="./images/polyeg.png" alt="Stallings" style="padding:5spx;width:50%;float:right"> <strong>Polynomial arithmetic</strong> includes the operations of addition and multiplication of polynomials. For example, with coefficients from the set <span class="math inline">\(S\)</span> of integers</p></li>
+</ul>
+</section>
+<section id="polynomial-arithmetic-with-coefficients-in-mathbbz_p" class="slide level2">
+<h2>Polynomial arithmetic with coefficients in <span class="math inline">\(\mathbb{Z}_p\)</span></h2>
+<ul>
+<li>Can be shown that the system of polynomials <span class="math inline">\(\sum_{i=0}^n a_i x^i\)</span>, with coefficients <span class="math inline">\(a_i\)</span> coming from the field <span class="math inline">\(\mathbb{Z}_p\)</span>, will form a commutative ring.</li>
+<li>The division process among such polynomials can still be carried out, but it will be a process of <em>division with remainder</em> like we have seen previously in the system <span class="math inline">\(\mathbb{Z}\)</span>.</li>
+</ul>
+<p><strong>Polynomial division</strong></p>
+<ul>
+<li>For a first example consider the system of polynomials with integer coefficients.</li>
+<li>Let <span class="math inline">\(f(x) = x^3 + x^2 + 2\)</span> and <span class="math inline">\(g(x) = x^2 - x +1\)</span>, then we can say that <span class="math display">\[f(x) = (x+2) g(x) + x,\]</span> i.e. that dividing <span class="math inline">\(f(x)\)</span> by <span class="math inline">\(g(x)\)</span> gives a <em>quotient</em> of <span class="math inline">\((x+2)\)</span> and a <em>remainder</em> of <span class="math inline">\(x\)</span>.</li>
+<li>We can write <span class="math inline">\(( f(x) \,\, \text{mod} \, \, g(x)) = x\)</span>.</li>
+<li>We require that the remainder polynomial has degree strictly less than the degree of the divisor polynomial, i.e. <span class="math inline">\(g(x)\)</span> in the equation above.</li>
+<li>Can carry out the calculation using some form of <em>long division</em>, see boards.</li>
+<li>Can multiply out the above equation to verify the result.</li>
+</ul>
+</section>
+<section id="polynomial-arithmetic-with-coefficients-in-textgf2-mathbbz_2" class="slide level2">
+<h2>Polynomial arithmetic with coefficients in <span class="math inline">\(\text{GF}(2) = \mathbb{Z}_2\)</span></h2>
+<ul>
+<li><img src="./images/polyarithoverGF2.png" alt="Stallings" style="padding:5spx;width=60%;float:right"> For cryptography purposes, polynomials with coefficients in <span class="math inline">\(\text{GF}(2) = \mathbb{Z}_2\)</span> are of most interest.</li>
+<li>That is, these are polynomials with binary coefficients, i.e. <span class="math inline">\(0\)</span> or <span class="math inline">\(1\)</span>, and these coefficients follow the rules of arithmetic in <span class="math inline">\(\mathbb{Z}_2\)</span>, <span class="math display">\[0+0=0, 1+1=0, 1+0=1, 1-1=0, 0-1=1, \dots \]</span></li>
+<li>This setup can make the resulting polynomial arithmetic tricky to follow.</li>
+<li>See the examples on the right for polyomial arithmetic operations two such polys <span class="math inline">\(f(x) = x^7 + x^5 +x^4+x^3+x+1\)</span> and <span class="math inline">\(g(x) = x^3 + x +1\)</span>.</li>
+<li>A polynomial <span class="math inline">\(f(x)\)</span> with coefficients from a field <span class="math inline">\(F\)</span> is called <strong>irreducible</strong> if and only if <span class="math inline">\(f(x)\)</span> cannot be expressed as a product of two other such polynomials, both of degree greater than 0 and less than the degree of <span class="math inline">\(f\)</span>.</li>
+<li>For example,
+<ul>
+<li>for polynomials over <span class="math inline">\(\mathbb{Z}_2\)</span>, the poly <span class="math inline">\(f(x) = x^4+1\)</span> is reducible as <span class="math display">\[x^4+1 = (x+1)(x^3+x^2+x+1).\]</span></li>
+<li>but <span class="math inline">\(g(x) = x^3 + x +1\)</span> is irreducible since neither <span class="math inline">\(x\)</span> nor <span class="math inline">\(x+1\)</span>, the only such polys of degree 2, is a factor of it.</li>
+</ul></li>
+</ul>
+</section>
+<section id="gcd-and-euclidean-algorithm-for-polynomials" class="slide level2">
+<h2>GCD and Euclidean algorithm for polynomials</h2>
+<ul>
+<li>For polynomials with coefficients from some particular field <span class="math inline">\(F\)</span> we can define <span class="math inline">\(\gcd\)</span> and the Euclidean algorithm, just like we did within the system <span class="math inline">\(\mathbb{Z}\)</span>.</li>
+<li>For polynomials <span class="math inline">\(a(x)\)</span> and <span class="math inline">\(b(x)\)</span>, their <span class="math inline">\(\gcd\)</span> is the polynomial <span class="math inline">\(c(x)\)</span> such that
+<ul>
+<li><span class="math inline">\(a(x)\)</span> and <span class="math inline">\(b(x)\)</span> are both divisible by <span class="math inline">\(c(x)\)</span>.</li>
+<li>Any other common divisor of <span class="math inline">\(a(x)\)</span> and <span class="math inline">\(b(x)\)</span>, also divides <span class="math inline">\(c(x)\)</span>.</li>
+</ul></li>
+<li>Or equivalently, the <span class="math inline">\(\gcd\)</span> of <span class="math inline">\(a(x)\)</span> and <span class="math inline">\(b(x)\)</span> is the polynomial of maximum degree, that divides both <span class="math inline">\(a(x)\)</span> and <span class="math inline">\(b(x)\)</span>.</li>
+<li><img src="./images/EAforpolys.png" alt="Stallings" style="padding:5spx;width=60%;float:right"> See specification or right, which is essentially the previous specification for the Euclidean algorithm, but now taking place for polynomials.</li>
+</ul>
+</section>
+<section id="gcd-and-euclidean-algorithm-for-polynomials-1" class="slide level2">
+<h2>GCD and Euclidean algorithm for polynomials</h2>
+<ul>
+<li><img src="./images/EAeg.png" alt="Stallings" style="padding:5spx;width=100%;float:right"> On the right, from Stallings, is an example showing the EA run to find the <span class="math inline">\(\gcd(a(x),b(x))\)</span>, where <span class="math display">\[a(x) = x^6 + x^5 + x^4 + x^3 +x^2 + x + 1\]</span> and <span class="math display">\[b(x) = x^4 + x^2 + x + 1,\]</span> are polynomials with coefficients in <span class="math inline">\(\mathbb{Z}_2\)</span>.</li>
+</ul>
+</section>
+<section id="finite-fields-of-the-form-textgf2n" class="slide level2">
+<h2>Finite fields of the form <span class="math inline">\(\text{GF}(2^n\)</span>)</h2>
+<ul>
+<li><img src="./images/GF8.png" alt="Stallings" style="padding:5spx;width=100%;float:right"> In computer science we commonly work with capacities (of memory size, size of comms channel, message block size, etc) of size <span class="math inline">\(2^n\)</span>, for some integer <span class="math inline">\(n\)</span>. As these are all based on a certain number of binary bits.</li>
+<li>With <span class="math inline">\(n\)</span> bits we can represent <span class="math inline">\(2^n\)</span> numbers: the integer 0, and the <span class="math inline">\(2^n -1\)</span> integers <span class="math inline">\(1,2,3, \dots, 2^n -1\)</span>.</li>
+<li>So we wish to have a finite field <span class="math inline">\(\text{GF}(2^n)\)</span>. Where does such a field come from?</li>
+<li>It can’t be the integers under the usual arithmetic modulo <span class="math inline">\(2^n\)</span>, as this will lack multiplicative inverses for half the elements.</li>
+<li>See table on the right for an example showing <span class="math inline">\(\text{GF}(2^3)\)</span> exists and then we’ll describe the general construction.</li>
+</ul>
+</section>
+<section id="modular-polynomial-arithmetic-and-textgfpn" class="slide level2">
+<h2>Modular polynomial arithmetic and <span class="math inline">\(\text{GF}(p^n)\)</span></h2>
+<ul>
+<li>The finite fields <span class="math inline">\(\text{GF}(p^n)\)</span> for primes <span class="math inline">\(p\)</span> and any positive integer exponent <span class="math inline">\(n\)</span> do indeed exits, and can be constructed from <strong>modular polynomial arithmetic</strong> as follows.</li>
+<li>Define <span class="math inline">\(S\)</span> to be the set of all polynomials of degree <span class="math inline">\(n-1\)</span>, or less, and with coefficients coming from the field <span class="math inline">\(\mathbb{Z}_p\)</span>, i.e. the coefficients follow the rules of integers arithmetic modulo <span class="math inline">\(p\)</span>.</li>
+<li>So <span class="math inline">\(S\)</span> consists of all polynomials <span class="math inline">\(f(x)\)</span> of the form <span class="math display">\[f(x) = a_{n-1} x^{n-1} + a_{n-2} x^{n-2} + \dots + a_1 x + a_0 = \sum_{i=0}^{n-1} a_i x^i, \quad a_i \in \mathbb{Z}_p.\]</span></li>
+<li>In total, there are <span class="math inline">\(p^n\)</span> such polynomials, since there is a choice of <span class="math inline">\(p\)</span> elements for each of the <span class="math inline">\(n\)</span> coefficients <span class="math inline">\(a_0, \dots , a_{n-1}\)</span>.</li>
+<li>The behaviour of <span class="math inline">\(+\)</span> and <span class="math inline">\(\cdot\)</span> on <span class="math inline">\(S\)</span> will follow the usual rules of polynomial arithmetic and
+<ul>
+<li>arithmetic with the coefficients <span class="math inline">\(a_i\)</span> is done under the rules of <span class="math inline">\(\mathbb{Z}_p\)</span>, i.e. integer arithmetic modulo <span class="math inline">\(p\)</span>,</li>
+<li>if multiplication of polynomials results in a polynomial of degree <span class="math inline">\(n\)</span> or greater then the results is reduced modulo some specified irreducible polynomial <span class="math inline">\(m(x)\)</span>, of degree <span class="math inline">\(m\)</span>. That is, we divide the result by <span class="math inline">\(m(x)\)</span> and keep the remainder polynomial <span class="math inline">\(r(x)\)</span>, which must have degree less than <span class="math inline">\(n\)</span>.</li>
+</ul></li>
+<li>The resulting system <span class="math inline">\((S, + , \cdot)\)</span> will be a field of <span class="math inline">\(p^n\)</span> elements. This shows that finite fields <span class="math inline">\(\text{GF}(p^n)\)</span> do exist.</li>
+</ul>
+</section>
+<section id="aes-and-textgf28." class="slide level2">
+<h2>AES and <span class="math inline">\(\text{GF}(2^8)\)</span>.</h2>
+<ul>
+<li><img src="./images/GF8examp.png" alt="Stallings" style="padding:5spx;width=100px;float:right"> The Advanceed Encryption Standard (AES) uses such a field <span class="math inline">\(\text{GF}(2^8)\)</span>, consisting of polynomials of degree less than or equal to 7, with binary coefficients and polynomial operations carried out modulo the irreducible polynomial <span class="math display">\[m(x) = x^8 + x^4 + x^3 + x +1.\]</span></li>
+<li>The figure on the right shows the calculation of an example product in <span class="math inline">\(\text{GF}(2^8)\)</span>.</li>
+</ul>
+</section>
+<section id="textgf23-again." class="slide level2">
+<h2><span class="math inline">\(\text{GF}(2^3)\)</span> again.</h2>
+<ul>
+<li>The tables below show addition and multiplication in <span class="math inline">\(\text{GF}(8)\)</span> <img src="./images/GF8again.png" alt="Stallings" style="padding:5spx;width=100%;float:right"></li>
+<li>The Extended Euclidean algorithm can be used to obtain multiplicative inverses just as before. See Stallings for examples.</li>
+<li>The polynomial operations do have efficient implementations in terms of bit sequence operations which means that computations in <span class="math inline">\(\text{GF}(8)\)</span> (and by generalization other <span class="math inline">\(\text{GF}(2^n)\)</span>) can be carried out very fast. See Stallings for details.</li>
+</ul>
+<!-- ## Using a generator -->
+</section>
+    </div>
+  </div>
+
+  <script src="../reveal.js/dist/reveal.js"></script>
+
+  // reveal.js plugins
+  <script src="../reveal.js/plugin/notes/notes.js"></script>
+  <script src="../reveal.js/plugin/search/search.js"></script>
+  <script src="../reveal.js/plugin/zoom/zoom.js"></script>
+  <script src="../reveal.js/plugin/math/math.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+      
+        // Push each slide change to the browser history
+        history: true,
+        // Transition style
+        transition: 'fade', // none/fade/slide/convex/concave/zoom
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1920,
+        height: 1080,
+        // Factor of the display size that should remain empty around the content
+        margin: 0.05,
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    </body>
+</html>

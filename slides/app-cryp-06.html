@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Killian O’Brien">
+  <meta name="author" content="6G6Z0024 Applied Cryptography 2025/26">
+  <title>Advanced Encryption Standard (AES)</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="../reveal.js2/dist/reset.css">
+  <link rel="stylesheet" href="../reveal.js2/dist/reveal.css">
+  <style>
+    .reveal .sourceCode {  /* see #7635 */
+      overflow: visible;
+    }
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="../reveal.js2/dist/theme/killian.css" id="theme">
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" data-background-color="rgb(0,47,108)" data-background-image="logowhite.png" data-background-position="95%
+5%" data-background-repeat="no-repeat" data-background-size="18%">
+  <h1 class="title">Advanced Encryption Standard (AES)</h1>
+  <p class="author">Killian O’Brien</p>
+  <p class="author">6G6Z0024 Applied Cryptography 2025/26</p>
+  <p class="date">Lecture Week 06 – Mon 02 November 2025</p>
+</section>
+
+<section id="introduction" class="slide level2">
+<h2>Introduction</h2>
+<ul>
+<li>The <strong>Advanced Encryption Standard</strong> (AES), published
+by NIST in 2001.</li>
+<li>To replace DES due to security concerns over small key size and
+other considerations.</li>
+<li>AES designed to be more secure and fast.</li>
+<li>From 2008 on, chip manufacturers implement AES capabilities in
+low-level chip design.</li>
+<li>Now the most widely used cipher.</li>
+</ul>
+</section>
+<section id="polynomial-arithmetic-and-the-fields-gf2n"
+class="slide level2">
+<h2>Polynomial arithmetic and the fields <span
+class="math inline">\(GF(2^n)\)</span></h2>
+<ul>
+<li>Consider all polynomials <span class="math display">\[f(x) = a_{n-1}
+x^{n-1} + a_{n-2} x^{n-2} + \dots + a_1 x + a_0 = \sum_{i=0}^{n-1} a_i
+x^i, \quad a_i \in \mathbb{Z}_2.\]</span> of degree <span
+class="math inline">\(n-1\)</span> or less.</li>
+<li>Arithmetic follows the rules of <span
+class="math inline">\(+\)</span> and <span
+class="math inline">\(\cdot\)</span> for polynomials, with arithmetic of
+the coefficients <span class="math inline">\(a_i\)</span> carried out in
+<span class="math inline">\(\mathbb{Z}_2\)</span>, i.e. addition of
+coefficients is the same as <span
+class="math inline">\(\text{XOR}\)</span>.</li>
+<li>If multiplication results in a polynomial of degree greater than
+<span class="math inline">\(n-1\)</span> then the product is reduced
+modulo a specified irreducible polynomial <span
+class="math inline">\(m(x)\)</span> of degree <span
+class="math inline">\(n\)</span>, the modulus polynomial.</li>
+</ul>
+</section>
+<section id="aes-and-textgf28." class="slide level2">
+<h2>AES and <span class="math inline">\(\text{GF}(2^8)\)</span>.</h2>
+<ul>
+<li><img src="./images/GF8examp.png" alt="Stallings" style="padding:5spx;width=100px;float:right">
+The Advanceed Encryption Standard (AES) uses such a field <span
+class="math inline">\(\text{GF}(2^8)\)</span>, consisting of polynomials
+of degree less than or equal to 7, with binary coefficients and
+polynomial operations carried out modulo the irreducible polynomial
+<span class="math display">\[m(x) = x^8 + x^4 + x^3 + x
++1.\]</span></li>
+<li>The figure on the right shows the calculation of an example product
+in <span class="math inline">\(\text{GF}(2^8)\)</span>.</li>
+<li>AES uses this since it is designed to operate on 8-bit bytes.
+<ul>
+<li>Addition of bytes is just bit-wise <span
+class="math inline">\(\text{XOR}\)</span>.</li>
+<li><em>Multiplication</em> of bytes is defined as multiplication in the
+finite field <span class="math inline">\(\text{GF}(2^8)\)</span>, modulo
+the irreducible polynomial <span class="math inline">\(m(x) = x^8 + x^4
++ x^3 + x +1.\)</span></li>
+</ul></li>
+</ul>
+</section>
+<section id="the-structure-of-aes" class="slide level2">
+<h2>The structure of AES</h2>
+<ul>
+<li><img src="./images/AESdesign.png" alt="Stallings" style="padding:5spx;width=150px;float:right">
+Operates on plaintext message blocks of 16 bytes = 128 bits.</li>
+<li>Various key lengths allowed, 16, 24 or 32 bytes. Ciphers referred to
+as AES-128, AES-192 or AES-256, depending on how many bits used in
+key.</li>
+<li>Throughout encryption (and decryption) the message block is
+maintained as a <span class="math inline">\(4 \times 4\)</span> array of
+bytes. This is referred to as the <strong>state</strong>.</li>
+<li>First four bytes form the first column, next four bytes the second
+column, and so on.</li>
+<li>An initial transformation of the state is followed by <span
+class="math inline">\(N\)</span> rounds. Where <span
+class="math inline">\(N\)</span> depends on the key length used.
+<ul>
+<li><span class="math inline">\(N=10\)</span> for 128 bit key.</li>
+<li><span class="math inline">\(N=12\)</span> for 192 bit key.</li>
+<li><span class="math inline">\(N=14\)</span> for 256 bit key.</li>
+</ul></li>
+<li>The key passes through a <em>key expansion</em> transformation to
+provide <span class="math inline">\(N+1\)</span> sub-keys to be used in
+the initial transformation and <span class="math inline">\(N\)</span>
+rounds.</li>
+<li>Each sub-key consists for four 4-byte <strong>words</strong>, which
+form the columns of the <strong>round key matrix</strong>.</li>
+</ul>
+</section>
+<section id="aes-detail" class="slide level2">
+<h2>AES detail</h2>
+<ul>
+<li><img src="./images/AESdetail.png" alt="Stallings" style="padding:5spx;width=150px;float:right">
+This figure exposes the transformations within each round, for AES-128.
+The other schemes are similar.</li>
+<li>Note that is departs from the Feistel design. There is no notion of
+dividing the block into halves.</li>
+<li>Rounds 1 - 9 consists of four transformations
+<ul>
+<li><strong>Substitute bytes</strong>: and S-box type permutation of the
+bytes of the state.</li>
+<li><strong>Shift rows</strong>: a simple permutation of the bytes
+within each row of the state.</li>
+<li><strong>Mix columns</strong>: a transformation that combines the
+bytes within each column of the state. This transformation uses the
+<span class="math inline">\(\text{GF}(2^8)\)</span> field.</li>
+<li><strong>Add round key</strong>: bit-wise <span
+class="math inline">\(\text{XOR}\)</span> of the state with the
+appropriate round key matrix.</li>
+</ul></li>
+<li>The decryption algorithm reverses all the transformations. At each
+horizontal level, the intermediate states of the encryption and
+decryption algorithms are the same.</li>
+</ul>
+</section>
+<section id="visualizing-a-single-round" class="slide level2">
+<h2>Visualizing a single round</h2>
+<ul>
+<li><img src="./images/AESsingleround.png" alt="Stallings" style="padding:5spx;width=150px;float:right">
+This figure visualizes the four transformations within a typical
+round.</li>
+<li>Here the state matrix is shown laid out as a row of 16 bytes.</li>
+</ul>
+</section>
+<section id="substitute-bytes" class="slide level2">
+<h2>Substitute bytes</h2>
+<ul>
+<li><img src="./images/subsbytes.png" alt="Stallings" style="padding:5spx;width=150px;float:right">
+This figure shows how the substitute bytes transformation is
+defined.</li>
+<li>For each entry of the incoming state matrix, i.e. for each byte
+<ul>
+<li>the first four bits denote the row index <span
+class="math inline">\(x\)</span> of the S-box</li>
+<li>the second four bits denote the column index <span
+class="math inline">\(y\)</span> of the S-box</li>
+<li>the S-box entry at that row and column is a byte that replaces the
+original byte of the state.</li>
+</ul></li>
+<li>After replacing each entry of the incoming state matrix, we get the
+outgoing state matrix.</li>
+</ul>
+</section>
+<section id="the-s-box-itself" class="slide level2">
+<h2>The S-box itself</h2>
+<ul>
+<li><img src="./images/s-box.png" alt="Stallings" style="padding:5spx;width=150px;float:right">
+This figure shows the S-box.</li>
+<li>Remember
+<ul>
+<li>a four bit block is denoted by a hexadecimal digit
+<code>0,1,...9,a,b,c,d,e,f</code>.</li>
+<li>a single byte (i.e. a 8-bit block) is denoted by a two-digit
+hexadecimal number.</li>
+</ul></li>
+<li>A corresponding inverse S-box table is used in the decryption
+algorithm.</li>
+<li>Lots of detail in Stallings on the construction of this S-box table.
+<ul>
+<li>Designed like this to minimize any correlation between incoming and
+outgoing bits.</li>
+<li>The construction of the S-box table involves the process of taking
+multiplicative inverses in <span
+class="math inline">\(\text{GF}(2^8)\)</span>, after interpreting the
+8-bit bytes as polynomials formed from that sequence of 8 binary
+coefficients.</li>
+</ul></li>
+<li>An example substitute bytes transformation is shown here
+<img src="./images/egsbox.png" alt="Stallings" style="padding:5spx;width=80px;"></li>
+</ul>
+</section>
+<section id="the-shift-rows-transformation" class="slide level2">
+<h2>The shift rows transformation</h2>
+<ul>
+<li><img src="./images/shiftrows.png" alt="Stallings" style="padding:5spx;width=150px;float:right">
+In each of the second, third and fourth rows of state, permute the bytes
+in each row as shown.</li>
+<li>This has a significant effect on the original positions of the bits
+within the 128 bit message block.</li>
+</ul>
+</section>
+<section id="mix-columns-transformation" class="slide level2">
+<h2>Mix columns transformation</h2>
+<ul>
+<li><p><img src="./images/mixcolsmatrices.png" alt="Stallings" style="padding:5spx;width=150px;float:right">
+The equation shows how the incoming state matrix <span
+class="math inline">\(s_{i,j}\)</span> is multiplied by the matrix of
+constants to get the outgoing state matrix <span
+class="math inline">\(s&#39;_{i,j}\)</span>, shown on the right of the
+equation.</p></li>
+<li><p>This results in the following transformations within the <span
+class="math inline">\(j^{\text{th}}\)</span> column of the state
+<img src="./images/coltrans.png" alt="Stallings" style="padding:5spx;width=150px;float:right"></p></li>
+<li><p>The operations <span class="math inline">\(\oplus\)</span> and
+<span class="math inline">\(\cdot\)</span> shown here are the operations
+from <span class="math inline">\(\text{GF}(2^8)\)</span>, carried out on
+the entries of the state, i.e. on the bytes, i.e. on the 8-bit blocks
+which are interpreted as the coefficients of degree 7
+polynomials.</p></li>
+<li><p>So <span class="math inline">\(\oplus\)</span> is bitwise <span
+class="math inline">\(\text{XOR}\)</span> and <span
+class="math inline">\(\cdot\)</span> is the multiplication obtained from
+the multiplication of these polynomials, modulo the polynomial <span
+class="math inline">\(m(x) = x^8 + x^4 + x^3 + x +1.\)</span></p></li>
+<li><p>The design of this Mix Columns transformation ensures good mixing
+of the bytes within a column, and the use of the constants
+<code>01</code>, <code>02</code> and <code>03</code> results in
+efficient implementation of the encryption algorithm.</p></li>
+</ul>
+</section>
+<section id="add-round-key-transformation" class="slide level2">
+<h2>Add round key transformation</h2>
+<ul>
+<li>Perhaps the most straightforward, this is just bitwise <span
+class="math inline">\(\text{XOR}\)</span> amongst the bit entries of the
+state and round key matrices.</li>
+<li>Consider the examples shown here
+<img src="./images/addroundeg.png" alt="Stallings" style="padding:5spx;width=150px;float:right">
+of <span class="math display">\[\text{incoming state} \oplus \text{round
+key} = \text{outgoing state}\]</span></li>
+</ul>
+</section>
+<section id="a-summary-flowchart-for-aes-encryption"
+class="slide level2">
+<h2>A summary flowchart for AES encryption</h2>
+<ul>
+<li><p><img src="./images/AESsummary.png" alt="Stallings" style="padding:5spx;width=150px;float:right">
+This figure summarizes a typical encryption round.</p></li>
+<li><p>We still need to describe the key expansion process for the
+derivation of the round keys from the original key.</p></li>
+</ul>
+</section>
+<section id="key-expansion-in-aes" class="slide level2">
+<h2>Key expansion in AES</h2>
+<ul>
+<li><img src="./images/AESdesign.png" alt="Stallings" style="padding:5spx;width=150px;float:right">
+<strong>Key expansion</strong> is the process where the initial key is
+expanded to produce the <span class="math inline">\(N+1\)</span> round
+keys for the initial transformation and the <span
+class="math inline">\(N\)</span> rounds of AES.</li>
+<li>Each round key consists of four 4-byte words, i.e. the four columns
+of the round key matrix.</li>
+</ul>
+</section>
+<section id="key-expansion-in-aes-128" class="slide level2">
+<h2>Key expansion in AES-128</h2>
+<ul>
+<li><img src="./images/AESkeyexp.png" alt="Stallings" style="padding:5spx;width=150px;float:right">
+The <span class="math inline">\(i^{\text{th}}\)</span> of the <span
+class="math inline">\(N+1\)</span> round keys consist of the four
+keywords <span class="math display">\[w_{4i + 0}, w_{4i + 1},w_{4i +
+2},w_{4i + 3}.\]</span></li>
+<li>The 16 bytes, <span class="math inline">\(k_0, k_1, \dots,
+k_{15}\)</span>, of the initial key form the first four key words <span
+class="math inline">\(w_0,w_1, w_3, w_3\)</span> as shown.</li>
+<li>An iterative process creates the 40 subsequent key words.
+<ul>
+<li>for <span class="math inline">\(j=1,2,3\)</span>, and <span
+class="math inline">\(i =1,\dots, 10\)</span>, <span
+class="math display">\[w_{4i+j} = w_{4i+j-1} \oplus
+w_{4(i-1)+j}.\]</span></li>
+<li>for <span class="math inline">\(j=0\)</span> and <span
+class="math inline">\(i =1 \dots 10\)</span>, <span
+class="math display">\[w_{4i} = g(w_{4i-1}) \oplus
+w_{4(i-1)}.\]</span></li>
+<li>the function <span class="math inline">\(g\)</span> is the
+composition of
+<ul>
+<li>a circular left-shift of the word bytes</li>
+<li>an S-box byte substitution using the same S-box table as in the AES
+encryption rounds</li>
+<li>a bitwise <span class="math inline">\(\text{XOR}\)</span> with the
+word formed by the bytes RC<sub>i</sub>, 00, 00, 00. The round constants
+RC<sub>i</sub> are shown on table on next slide.</li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<section id="design-considerations-of-the-key-expansion-algorithm"
+class="slide level2">
+<h2>Design considerations of the key expansion algorithm</h2>
+<ul>
+<li><p>The round constants RC<sub>i</sub>.
+<img src="./images/RCtable.png" alt="Stallings" style="padding:5spx;width=150px;float:right"></p></li>
+<li><p>These transformations were chosen to ensure these features,
+amongst others,</p>
+<ul>
+<li>speedy implementations in software and chip hardware,</li>
+<li>partial knowledge of the original key or intermediate round keys
+will not enable determination of many other bits of other keywords,</li>
+<li>use of different round constants eliminates any potential symmetries
+in the round key generations,</li>
+<li>diffusion, i.e. each bit of the original key effects many round key
+bits.</li>
+</ul></li>
+<li><p>Further details, worked examples, and illustrations of bit
+diffusion from plaintext and key differences can be found in
+<a href="https://mmu.on.worldcat.org/oclc/1334132058" target="_blank">Stallings,
+Chapter 6: AES</a></p></li>
+</ul>
+</section>
+    </div>
+  </div>
+
+  <script src="../reveal.js2/dist/reveal.js"></script>
+
+  <!-- reveal.js plugins -->
+  <script src="../reveal.js2/plugin/notes/notes.js"></script>
+  <script src="../reveal.js2/plugin/search/search.js"></script>
+  <script src="../reveal.js2/plugin/zoom/zoom.js"></script>
+  <script src="../reveal.js2/plugin/math/math.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: true,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'bottom-right',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: false,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'default',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: true,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'fade',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1920,
+
+        height: 1080,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 5.0e-2,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    </body>
+</html>

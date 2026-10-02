@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Killian O’Brien">
+  <meta name="author" content="6G6Z0024 Applied Cryptography 2025/26">
+  <title>Miller-Rabin primality test</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="../reveal.js2/dist/reset.css">
+  <link rel="stylesheet" href="../reveal.js2/dist/reveal.css">
+  <style>
+    .reveal .sourceCode {  /* see #7635 */
+      overflow: visible;
+    }
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="../reveal.js2/dist/theme/killian.css" id="theme">
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" data-background-color="rgb(0,47,108)" data-background-image="logowhite.png" data-background-position="95%
+5%" data-background-repeat="no-repeat" data-background-size="18%">
+  <h1 class="title">Miller-Rabin primality test</h1>
+  <p class="author">Killian O’Brien</p>
+  <p class="author">6G6Z0024 Applied Cryptography 2025/26</p>
+  <p class="date">Lecture Week 11 – Mon 08 December 2025</p>
+</section>
+
+<section id="miller-rabin-primality-test." class="slide level2">
+<h2>Miller-Rabin primality test.</h2>
+<ul>
+<li>Definitively testing large integers for primeness is computationally
+hard (i.e. long) for large primes.</li>
+<li>But having large primes or <em>pseudo-primes</em> is important for
+many cryptography applications.</li>
+<li>Thankfully there are quicker <em>probabilistic</em> tests for
+primeness available.
+<ul>
+<li>such tests identify <em>pseudo-primes</em>, i.e. integers that share
+many properties of prime numbers or that are likely, to a high
+probability, to be prime.</li>
+</ul></li>
+</ul>
+<p><strong>Background</strong></p>
+<ul>
+<li>Recall Fermat’s Little Theorem: If <span
+class="math inline">\(p\)</span> is a prime, and <span
+class="math inline">\(a\)</span> an integer coprime to <span
+class="math inline">\(p\)</span>, then <span class="math display">\[
+a^{p-1} \equiv 1 \pmod{p}.\]</span></li>
+<li>This can be turned into a test for primality by efficiently
+searching for the breakdown of this condition when the modulus is not in
+fact prime.</li>
+<li>So if we find an <span class="math inline">\(a\)</span> that is
+coprime to <span class="math inline">\(n\)</span> but<br />
+<span class="math display">\[ a^{n-1} \not \equiv 1 \pmod{n}\]</span>
+then we can conclude that <span class="math inline">\(n\)</span> is not
+prime.</li>
+</ul>
+</section>
+<section id="miller-rabin-primality-test.-1" class="slide level2">
+<h2>Miller-Rabin primality test.</h2>
+<ul>
+<li>Let <span class="math inline">\(n\)</span> be an odd integer. Then
+we can express <span class="math inline">\(n\)</span> as <span
+class="math display">\[n = 2^k \cdot q + 1,\]</span> for suitable
+integers <span class="math inline">\(k,q\)</span>, where <span
+class="math inline">\(q\)</span> is odd and <span
+class="math inline">\(k \geq 1\)</span>.</li>
+<li>Note that these values of <span class="math inline">\(k\)</span> and
+<span class="math inline">\(q\)</span> can be quickly found, even for
+large <span class="math inline">\(n\)</span>.</li>
+<li>Now, if <span class="math inline">\(n\)</span> is prime, and <span
+class="math inline">\(a\)</span> is an integer <span
+class="math inline">\(1 \lt a \lt n-1\)</span>, then Fermat’s Little
+Theorem implies that <span class="math display">\[a^{n-1} \equiv a^{2^k
+q} \equiv 1 \pmod{n}.\]</span></li>
+<li>Consider the sequence of powers leading up to <span
+class="math inline">\(a^{2^k q}\)</span>, namely, <span
+class="math display">\[a^q, a^{2q}, a^{2^2 q} , a^{2^3 q}, \dots ,
+a^{2^k q},\]</span> and note that each element on this list is the
+square of the previous element.</li>
+<li>We know that the last element <span
+class="math inline">\(a^{2^kq}\)</span> is <span
+class="math inline">\(\equiv 1 \pmod{n}\)</span> if <span
+class="math inline">\(n\)</span> is prime. So this means that somewhere
+earlier in the list the element must be <span
+class="math inline">\(\equiv +1\)</span> or <span
+class="math inline">\(-1 \pmod{n }\)</span>, since <span
+class="math inline">\(\pm 1\)</span> are the only two elements that
+square to <span class="math inline">\(1\)</span>.</li>
+<li>So we will know for certain that <span
+class="math inline">\(n\)</span> is <strong>not prime</strong> if we
+encounter an element <span class="math inline">\(a\)</span>, satisfying
+<span class="math inline">\(1 \leq a \leq n-1\)</span> where the list of
+residues modulo <span class="math inline">\(n\)</span> <span
+class="math display">\[a^q, a^{2q}, a^{2^2 q} , a^{2^3 q}, \dots ,
+a^{2^{k-1} q},\]</span> does not contain any member congruent to <span
+class="math inline">\(1\)</span> or <span
+class="math inline">\(-1\)</span> modulo <span
+class="math inline">\(n\)</span>.</li>
+</ul>
+</section>
+<section id="miller-rabin-primality-test.-2" class="slide level2">
+<h2>Miller-Rabin primality test.</h2>
+<p><strong>The algorithm</strong></p>
+<ul>
+<li>Given an odd integer <span class="math inline">\(n\)</span>,
+determine <span class="math inline">\(k\)</span> and <span
+class="math inline">\(q\)</span> such that <span
+class="math display">\[n = 2^k q +1,\]</span> where <span
+class="math inline">\(q\)</span> is odd.</li>
+<li>Select a random <span class="math inline">\(a\)</span>, satisfying
+<span class="math inline">\(1 \lt a \lt n-1\)</span></li>
+<li>Proceed through the list <span class="math display">\[a^q, a^{2q},
+a^{2^2 q} , a^{2^3 q}, \dots , a^{2^{(k-1)} q} \quad \pmod{n},\]</span>
+by starting with <span class="math inline">\(a^q\)</span> and repeatedly
+squaring.</li>
+<li>If the list <strong>does not</strong> contain any element <span
+class="math inline">\(\equiv \pm 1 \pmod{n}\)</span> then stop and
+return <strong>n is composite</strong>.</li>
+<li>Otherwise return <strong>inconclusive</strong>, i.e. <span
+class="math inline">\(n\)</span> may or may not be prime.</li>
+</ul>
+<p><strong>Repeated use of the algorithm</strong></p>
+<ul>
+<li>It can be shown that the probability that if <span
+class="math inline">\(n\)</span> is composite, it passes this test,
+i.e. returns <strong>inconclusive</strong>, is approximately <span
+class="math inline">\(1/4 = 25\%\)</span>.</li>
+<li>So if we test <span class="math inline">\(t\)</span> different
+values of <span class="math inline">\(a\)</span>, the probability that a
+composite <span class="math inline">\(n\)</span> will pass the test is
+approx. <span class="math inline">\((1/4)^t\)</span>.</li>
+<li>This means we can be very confident in the primeness of <span
+class="math inline">\(n\)</span>. For example, a composite <span
+class="math inline">\(n\)</span> passing 10 applications of this test
+can happen only with a probability less than <span
+class="math inline">\(10^{-6} = 1/(1,000,000)\)</span>.</li>
+</ul>
+</section>
+<section id="correction-to-stallings" class="slide level2">
+<h2>Correction to Stallings</h2>
+<ul>
+<li>The Miller-Rabin test is discussed in detail in
+<a href="https://mmu.on.worldcat.org/oclc/1334132058" target="_blank">Section
+2.6 in Stallings</a>.</li>
+<li>On page 67 there is a pseudo-code definition for a function
+<code>Test(n)</code> implementing the test.</li>
+<li>Unfortunately the typesetting is not correct there. I think this is
+a result of the conversion to a pdf ebook perhaps?</li>
+<li>Here is a corrected version of that pseudo-code. Not that the if a
+<code>return</code> command executes, the function <code>Test</code>
+will cease executing and pass control back to whatever code or user
+invoked the function.</li>
+</ul>
+<pre><code>Test(n)
+
+1. Find integers k, q with k &gt; 0, q odd, so that n - 1 = 2^k * q;
+2. Select a random integer a, satisfying 1 &lt; a &lt; n - 1;
+3. if a^q mod n = 1 then return(&#39;inconclusive&#39;);
+4. for j = 0 to k - 1 do
+    5. if a^((2^j) * q) mod n = n - 1 then return(&#39;inconclusive&#39;);
+6. return(&#39;composite&#39;)
+</code></pre>
+</section>
+    </div>
+  </div>
+
+  <script src="../reveal.js2/dist/reveal.js"></script>
+
+  <!-- reveal.js plugins -->
+  <script src="../reveal.js2/plugin/notes/notes.js"></script>
+  <script src="../reveal.js2/plugin/search/search.js"></script>
+  <script src="../reveal.js2/plugin/zoom/zoom.js"></script>
+  <script src="../reveal.js2/plugin/math/math.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: true,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'bottom-right',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: false,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'default',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: true,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'fade',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1920,
+
+        height: 1080,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 5.0e-2,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    </body>
+</html>

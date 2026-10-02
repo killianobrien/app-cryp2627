@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Killian O’Brien">
+  <meta name="author" content="6G6Z0024 Applied Cryptography 2025/26">
+  <title>Cryptographic hash functions</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="../reveal.js2/dist/reset.css">
+  <link rel="stylesheet" href="../reveal.js2/dist/reveal.css">
+  <style>
+    .reveal .sourceCode {  /* see #7635 */
+      overflow: visible;
+    }
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="../reveal.js2/dist/theme/killian.css" id="theme">
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" data-background-color="rgb(0,47,108)" data-background-image="logowhite.png" data-background-position="95%
+5%" data-background-repeat="no-repeat" data-background-size="18%">
+  <h1 class="title">Cryptographic hash functions</h1>
+  <p class="author">Killian O’Brien</p>
+  <p class="author">6G6Z0024 Applied Cryptography 2025/26</p>
+  <p class="date">Lecture Week 09 – Mon 24 November 2025</p>
+</section>
+
+<section id="introduction" class="slide level2">
+<h2>Introduction</h2>
+<ul>
+<li>Reading:
+<a href="https://mmu.on.worldcat.org/oclc/1334132058" target="_blank">Stallings,
+Chapter 11,<em>Cryptographic Hash Functions</em></a></li>
+</ul>
+<p><strong>Basic idea of a (cryptographic) hash function <span
+class="math inline">\(H\)</span></strong></p>
+<ul>
+<li><img src="./images/hash-idea.png" alt="Stallings" style="padding:5px;height=100%;float:right">
+<span class="math inline">\(H\)</span> takes a variable-length block of
+data <span class="math inline">\(M\)</span> and computes a fixed sized
+output <span class="math inline">\(h=H(M)\)</span>.</li>
+<li><span class="math inline">\(h\)</span> called the <em>hash
+value</em>, or <em>hash code</em> or <em>message digest</em>.</li>
+<li>Typically, the input message <span class="math inline">\(M\)</span>
+is split into standard sized blocks, with padding <span
+class="math inline">\(P\)</span> if necessary, often including data on
+the length <span class="math inline">\(L\)</span> of <span
+class="math inline">\(M\)</span>.</li>
+<li>Typically, <span class="math inline">\(h\)</span> will come from a
+very large domain of possible values, and different inputs <span
+class="math inline">\(M\)</span> will produce outputs <span
+class="math inline">\(h\)</span> that are evenly distributed and
+apparently random selections from this domain.</li>
+<li>The inner workings of <span class="math inline">\(H\)</span> will be
+somewhat complex, but still have fast implementations in software and/or
+hardware.</li>
+<li>For cryptographic hash functions, the inner workings of <span
+class="math inline">\(H\)</span> will ensure security, in that it should
+be computationally infeasible to compute
+<ul>
+<li>a message <span class="math inline">\(M\)</span> that will hash to a
+given hash value <span class="math inline">\(h\)</span> (pre-image
+resistance)</li>
+<li>two messages <span class="math inline">\(M_1\)</span> and <span
+class="math inline">\(M_2\)</span> that hash to the same hash value
+(collision resitance)</li>
+</ul></li>
+</ul>
+<p><strong>Applications in</strong></p>
+<ul>
+<li>Message authentication, Digital signatures, Password authentication,
+…</li>
+</ul>
+<!-- ## Applications of cryptographic hash functions
+
+* Message authentication
+* Digital signatures
+* Password authentication
+* ... -->
+</section>
+<section id="applications-of-cryptographic-hash-functions"
+class="slide level2">
+<h2>Applications of cryptographic hash functions</h2>
+<p><strong>Message authentication</strong></p>
+<ul>
+<li><span class="math inline">\(H\)</span> can be used to verify the
+integrity of data in storage or communication. To ensure that it has not
+been changed.</li>
+<li>In very simple terms, the hash value can be appended to the data as
+shown on below on left.</li>
+<li>This is too simple though, and susceptible to <em>man-in-the-middle
+attacks</em>, as shown on right.</li>
+</ul>
+<p><img src="./images/simple-hash.png" alt="Stallings" style="padding:5px;height=100%;float:left">
+<img src="./images/maninthemiddlehash.png" alt="Stallings" style="padding:5px;height=100%;float:right"></p>
+</section>
+<section id="applications-of-cryptographic-hash-functions-1"
+class="slide level2">
+<h2>Applications of cryptographic hash functions</h2>
+<p><strong>Message authentication possibilities</strong></p>
+<ul>
+<li><img src="./images/MACmodes.png" alt="Stallings" style="padding:5px;height=100%;float:right">
+The diagram on the right shows some ways in which <span
+class="math inline">\(H\)</span> can be used to implement message
+authentication.</li>
+<li>Diagram key
+<ul>
+<li>a cryptographic hash function <span
+class="math inline">\(H\)</span></li>
+<li>message <span class="math inline">\(M\)</span> to be
+communicated</li>
+<li>concatenation operator <span class="math inline">\(||\)</span></li>
+<li>a secret symmetric key <span class="math inline">\(K\)</span></li>
+<li>symmetric key encryption <span class="math inline">\(E\)</span></li>
+<li>a shared secret value <span class="math inline">\(S\)</span></li>
+</ul></li>
+</ul>
+</section>
+<section id="applications-of-cryptographic-hash-functions-2"
+class="slide level2">
+<h2>Applications of cryptographic hash functions</h2>
+<p><strong>Digital signatures</strong></p>
+<ul>
+<li><img src="./images/hash-signatures.png" alt="Stallings" style="padding:5px;height=100%;float:right">
+Here the emphasis is on authentication and proof of the identity of the
+sender of the message <span class="math inline">\(M\)</span></li>
+<li>The hash function <span class="math inline">\(H\)</span> can be used
+in combination with asymmetric public key encryption <span
+class="math inline">\(E\)</span>, with public <span
+class="math inline">\(PU_a\)</span>, and private <span
+class="math inline">\(PR_a\)</span>, keys of the sender <span
+class="math inline">\(A\)</span>.</li>
+<li>Diagram key
+<ul>
+<li>a cryptographic hash function <span
+class="math inline">\(H\)</span></li>
+<li>message <span class="math inline">\(M\)</span> to be
+communicated</li>
+<li>concatenation operator <span class="math inline">\(||\)</span></li>
+<li>sender <span class="math inline">\(A\)</span>’s (public,private) key
+pair <span class="math inline">\((PU_a,PR_a)\)</span></li>
+<li>symmetric/asymmetric (depending on keys used) encryption <span
+class="math inline">\(E\)</span></li>
+</ul></li>
+</ul>
+<!-- ## Requirements and security -->
+</section>
+<section id="merkle-damgard-iterated-hash-function-design"
+class="slide level2">
+<h2>Merkle-Damgard iterated hash function design</h2>
+<ul>
+<li><img src="./images/merkle-hash.png" alt="Stallings" style="padding:5px;height=100%;float:right">
+Merkle and Damgard proposed this iterated design based on a
+<em>compression function</em> <span class="math inline">\(f\)</span>
+that produces an <span class="math inline">\(n\)</span>-bit hash
+value.</li>
+<li>The input message is split into <span
+class="math inline">\(L\)</span> fixed-size blocks <span
+class="math inline">\(Y_i\)</span> of <span
+class="math inline">\(b\)</span> bits each.</li>
+<li>The final block <span class="math inline">\(Y_{L-1}\)</span> also
+contains the length information of the original message and any
+necessary padding to make it up to <span
+class="math inline">\(b\)</span> bits.</li>
+<li>The <span class="math inline">\(i^{\text{th}}\)</span> compression
+function <span class="math inline">\(f\)</span> takes two inputs, the
+message block <span class="math inline">\(Y_{i-1}\)</span> and an <span
+class="math inline">\(n\)</span> bit <em>chaining variable</em> <span
+class="math inline">\(CV_{i-1}\)</span>, and produces an <span
+class="math inline">\(n\)</span>-bit output chaining variable <span
+class="math inline">\(CV_{i}\)</span>.</li>
+<li><span class="math inline">\(CV_0 = IV = \text{ standard initial
+$n$-bit value}\)</span></li>
+<li><span class="math inline">\(CV_{i} = f(CV_{i-1}, Y_{i-1}), \quad 1
+\leq i \leq L\)</span></li>
+<li><span class="math inline">\(H(M) = CV_L\)</span></li>
+</ul>
+</section>
+<section id="the-sha-family-and-sha-512" class="slide level2">
+<h2>The SHA family and SHA-512</h2>
+<ul>
+<li>Secure Hash Algorithm (SHA) family produced by NIST have been the
+most widely used cryptographic hash functions.</li>
+<li><img src="./images/SHAfamily.png" alt="Stallings" style="padding:5px;height=100%;float:right">
+Offers hash functions of increasing complexity and security.</li>
+<li>As earlier versions become vulnerable to discovered weaknesses in
+combination with brute-force attack, then later versions adopted.</li>
+<li>Currently SHA-256 and SHA-512 seen as sensible.</li>
+</ul>
+</section>
+<section id="sha-512" class="slide level2">
+<h2>SHA-512</h2>
+<p><strong>Overall design</strong></p>
+<ul>
+<li><img src="./images/SHA-512-overall.png" alt="Stallings" style="padding:5px;height=100%;float:right">
+Input message <span class="math inline">\(M\)</span> is padded with
+<code>1000...0</code> until its length is <span
+class="math inline">\(\equiv 896 \pmod{1024}\)</span>.</li>
+<li>Then the bit-length <span class="math inline">\(L\)</span> of <span
+class="math inline">\(M\)</span> is appended as an unsigned 128-bit
+integer.</li>
+<li>We now have some number <span class="math inline">\(N\)</span> of
+1024-bit blocks, <span class="math inline">\(M_1, M_2, \dots,
+M_N\)</span>.</li>
+<li>The intermediate hash buffer is initialized with standard initial
+values <span class="math inline">\(H_0 = IV\)</span>, derived from the
+fractional parts of the square roots of the first eight prime numbers
+(i.e. essentially random bits).</li>
+<li>An intermediate step of SHA-512 takes the block <span
+class="math inline">\(M_i\)</span> and previous intermediate hash buffer
+<span class="math inline">\(H_{i-1}\)</span> and processes it with an
+80-round processing module <span class="math inline">\(F\)</span>.</li>
+<li>This produces a 512-bit output that is combined with an
+addition-like operation with <span
+class="math inline">\(H_{i-1}\)</span>.<br />
+</li>
+<li>The final 512-bit output <span class="math inline">\(H_N\)</span> is
+the hash value of SHA-512.</li>
+</ul>
+</section>
+<section id="the-80-round-processing-module-f" class="slide level2">
+<h2>The 80-round processing module <span
+class="math inline">\(F\)</span></h2>
+<ul>
+<li><img src="./images/module-80round.png" alt="Stallings" style="padding:5px;height=100%;float:right">
+This diagram shows the makeup of the processing module <span
+class="math inline">\(F\)</span>.</li>
+<li>Operates on the 8 64-bit words making up the 512-bit intermediate
+hash buffer <span class="math inline">\(H_{i-1}\)</span>.</li>
+<li>The message block <span class="math inline">\(M_i\)</span> supplies
+80 different 64-bit words <span class="math inline">\(W_t\)</span> via a
+<em>message schedule</em> algorithm, one for each round.</li>
+<li>80 different 64-bit constants <span
+class="math inline">\(K_t\)</span> are used, one for each round. These
+are derived from the fractional parts of the cube roots of the first 80
+prime numbers, again this produces essentially random bits for
+input.</li>
+<li>The additions <span class="math inline">\(+\)</span> shown here are
+carried out word-by-word on the 8 64-bit pairs of inputs, one from <span
+class="math inline">\(H_{i-1}\)</span>, one from the corresponding
+output of the last of the 80 rounds. The additions are carried out
+modulo <span class="math inline">\(2^{64}\)</span>.</li>
+</ul>
+</section>
+<section id="the-detail-of-the-80-rounds" class="slide level2">
+<h2>The detail of the 80 rounds</h2>
+<ul>
+<li><img src="./images/round-detail.png" alt="Stallings" style="padding:5px;float:right">
+This shows the operations within the one of the 80 rounds.</li>
+<li>The 8 input 64-bit words <span
+class="math inline">\(a,b,c,d,e,f,g,h\)</span> are processed to the 8
+output 64-bit words <span
+class="math inline">\(a,b,c,d,e,f,g,h\)</span>. Some by relabelling, and
+others by more complex operations.</li>
+<li>The additions <span class="math inline">\(+\)</span> shown here are
+word additions modulo <span class="math inline">\(2^{64}\)</span>.</li>
+<li>Employs bit-wise logical functions <span
+class="math inline">\(\text{Ch}\)</span> and <span
+class="math inline">\(\text{Maj}\)</span>, <span
+class="math inline">\(\oplus\)</span> denotes bit-wise <span
+class="math inline">\(\text{XOR}\)</span></li>
+<li><span class="math inline">\(\text{Ch}(e,f,g) = (e \text{ AND } f)
+\oplus (\text{ NOT } e \text{ AND } g)\)</span>. This is equivalent to
+<em>If e then f, else g</em>.</li>
+<li><span class="math inline">\(\text{Maj}(a,b,c) = (a \text{ AND } b)
+\oplus (a \text{ AND } c) \oplus (b \text{ AND } c)\)</span>. This is
+true only if the majority of the arguments (i.e. 2 or 3 of them) are
+true.</li>
+<li><span class="math inline">\(\Sigma(a) = \text{ROTR}^{28}(a) \oplus
+\text{ROTR}^{34}(a) \oplus \text{ROTR}^{39}(a)\)</span>, where <span
+class="math inline">\(\text{ROTR}^n\)</span> denotes circular right
+shift of the bits by <span class="math inline">\(n\)</span> bits.</li>
+<li><span class="math inline">\(\Sigma(e) = \text{ROTR}^{14}(e) \oplus
+\text{ROTR}^{18}(e) \oplus \text{ROTR}^{41}(e)\)</span>, where <span
+class="math inline">\(\text{ROTR}^n\)</span> denotes circular right
+shift of the bits by <span class="math inline">\(n\)</span> bits.</li>
+</ul>
+</section>
+<section id="sha-512-message-schedule-algorithm" class="slide level2">
+<h2>SHA-512 message schedule algorithm</h2>
+<ul>
+<li><img src="./images/message-schedule.png" alt="Stallings" style="padding:5px;float:right">
+This shows the operations within the one of the 80 rounds.</li>
+<li>First 16 64-bit words <span class="math inline">\(W_0, \dots,
+W_{15}\)</span> obtained directly from <span
+class="math inline">\(M_i\)</span>.</li>
+<li>Subsequent words obtained by processing previous words.</li>
+<li><span class="math inline">\(W_t = \sigma_1(W_{t-2}) + W_{t-7} +
+\sigma_0(W_{t-15}) + W_{t-16}\)</span></li>
+<li>These are word by word additions modulo <span
+class="math inline">\(2^{64}\)</span></li>
+<li><span class="math inline">\(\sigma_0(x) = \text{ROTR}^{1}(x) \oplus
+\text{ROTR}^{8}(x) \oplus \text{SHR}^{7}(x)\)</span></li>
+<li><span class="math inline">\(\sigma_1(x) = \text{ROTR}^{19}(x) \oplus
+\text{ROTR}^{61}(x) \oplus \text{SHR}^{6}(x)\)</span></li>
+<li>where <span class="math inline">\(\text{ROTR}^n\)</span> is as
+before, a right circular shift by <span class="math inline">\(n\)</span>
+bits, and <span class="math inline">\(\text{SHR}^n\)</span> is right
+shift of the 64-bit word by <span class="math inline">\(n\)</span> bits,
+and padding with <span class="math inline">\(64-n\)</span> zeros on the
+left. So <span class="math inline">\(\text{SHR}^n\)</span> loses bit
+information.</li>
+</ul>
+</section>
+    </div>
+  </div>
+
+  <script src="../reveal.js2/dist/reveal.js"></script>
+
+  <!-- reveal.js plugins -->
+  <script src="../reveal.js2/plugin/notes/notes.js"></script>
+  <script src="../reveal.js2/plugin/search/search.js"></script>
+  <script src="../reveal.js2/plugin/zoom/zoom.js"></script>
+  <script src="../reveal.js2/plugin/math/math.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: true,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: true,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'bottom-right',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: false,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'default',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: true,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'fade',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'fade',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1920,
+
+        height: 1080,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 5.0e-2,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    </body>
+</html>
