@@ -3,7 +3,7 @@ title: "Introduction to Number Theory"
 author:
 - Killian O'Brien
 - 6G6Z0024 Applied Cryptography
-date: Lecture Week 01 -- Mon 29 September 2025
+date: Lecture Week 01 -- Wed -7 Oct 2026
 transition: fade
 theme: killian
 width: 1920
@@ -29,7 +29,7 @@ title-slide-attributes:
 
 * Timetable
 
-* Let's look at the [Moodle](https://moodle.mmu.ac.uk/course/view.php?id=194955){target="_blank"} page for the unit.
+* Let's look at the [Moodle](https://moodle.mmu.ac.uk/course/view.php?id=205570){target="_blank"} page for the unit.
 
 ## Introduction to Number Theory
 

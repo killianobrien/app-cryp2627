@@ -15,10 +15,16 @@
     .reveal .sourceCode {  /* see #7635 */
       overflow: visible;
     }
-    code{white-space: pre-wrap;}
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     /* The extra [class] is a hack that increases specificity enough to
        override a similar rule in reveal.js */
@@ -41,7 +47,7 @@
   <h1 class="title">Introduction to Number Theory</h1>
   <p class="author">Killian O’Brien</p>
   <p class="author">6G6Z0024 Applied Cryptography</p>
-  <p class="date">Lecture Week 01 – Mon 29 September 2025</p>
+  <p class="date">Lecture Week 01 – Wed -7 Oct 2026</p>
 </section>
 
 <section id="introduction-to-the-unit" class="slide level2">
@@ -56,7 +62,7 @@ See Moodle for contact details.</p></li>
 <li><p>Assessment is 100% coursework. A portfolio of exercises.</p></li>
 <li><p>Timetable</p></li>
 <li><p>Let’s look at the <a
-href="https://moodle.mmu.ac.uk/course/view.php?id=194955"
+href="https://moodle.mmu.ac.uk/course/view.php?id=205570"
 target="_blank">Moodle</a> page for the unit.</p></li>
 </ul>
 </section>
@@ -676,7 +682,7 @@ class="math inline">\(x \equiv a^{-1} \pmod{n}\)</span>.</li>
         margin: 7.0e-2,
 
         math: {
-          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js',
           config: 'TeX-AMS_HTML-full',
           tex2jax: {
             inlineMath: [['\\(','\\)']],
