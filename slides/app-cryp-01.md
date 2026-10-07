@@ -262,7 +262,7 @@ $$ xa + yb = d.$$
 $$xa + yn = 1,$$
 then $x \equiv a^{-1} \pmod{n}$.
 
-## Extended Euclidean algorithm example
+<!-- ## Extended Euclidean algorithm example
 
 * From before, to find  $\gcd(710,310)$ we performed the following integer divisions.
 * $710 = 2 \cdot 310 + 90$ so $\gcd(710,310) = \gcd(310,90)$,
@@ -275,7 +275,7 @@ To obtain a pair $x,y$ that satisfy $x \cdot 710 + y \cdot 310 = 10$, we perform
 $\begin{align*}
 4 & 7 \\
 5 & 6
-\end{align*}$
+\end{align*}$ -->
 
 
 <!-- ## Prime numbers
