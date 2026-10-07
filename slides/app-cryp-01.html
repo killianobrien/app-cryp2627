@@ -501,6 +501,29 @@ coefficients <span class="math inline">\(x,y\)</span> such that <span
 class="math display">\[xa + yn = 1,\]</span> then <span
 class="math inline">\(x \equiv a^{-1} \pmod{n}\)</span>.</li>
 </ul>
+</section>
+<section id="extended-euclidean-algorithm-example" class="slide level2">
+<h2>Extended Euclidean algorithm example</h2>
+<ul>
+<li>From before, to find <span
+class="math inline">\(\gcd(710,310)\)</span> we performed the following
+integer divisions.</li>
+<li><span class="math inline">\(710 = 2 \cdot 310 + 90\)</span> so <span
+class="math inline">\(\gcd(710,310) = \gcd(310,90)\)</span>,</li>
+<li><span class="math inline">\(310 = 3 \cdot 90 + 40\)</span> so <span
+class="math inline">\(\gcd(310,90) = \gcd(90,40)\)</span>,</li>
+<li><span class="math inline">\(90 = 2 \cdot 40 + 10\)</span> so <span
+class="math inline">\(\gcd(90,40) = \gcd(40,10)\)</span>,</li>
+<li><span class="math inline">\(40 = 4 \cdot 10 + 0\)</span> so <span
+class="math inline">\(\gcd(40,10) = \gcd(10,0)=10\)</span>.</li>
+</ul>
+<p>To obtain a pair <span class="math inline">\(x,y\)</span> that
+satisfy <span class="math inline">\(x \cdot 710 + y \cdot 310 =
+10\)</span>, we perform the following manipulations.</p>
+<p><span class="math inline">\(\begin{align*}
+4 &amp; 7 \\
+5 &amp; 6
+\end{align*}\)</span></p>
 <!-- ## Prime numbers
 
 ## Fermat's Little Theorem
@@ -521,10 +544,10 @@ class="math inline">\(x \equiv a^{-1} \pmod{n}\)</span>.</li>
   <script src="../reveal.js2/dist/reveal.js"></script>
 
   <!-- reveal.js plugins -->
-  <script src="../reveal.js2/plugin/notes/notes.js"></script>
-  <script src="../reveal.js2/plugin/search/search.js"></script>
-  <script src="../reveal.js2/plugin/zoom/zoom.js"></script>
-  <script src="../reveal.js2/plugin/math/math.js"></script>
+  <script src="../reveal.js2/dist/plugin/notes.js"></script>
+  <script src="../reveal.js2/dist/plugin/search.js"></script>
+  <script src="../reveal.js2/dist/plugin/zoom.js"></script>
+  <script src="../reveal.js2/dist/plugin/math.js"></script>
 
   <script>
 
