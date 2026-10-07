@@ -501,20 +501,51 @@ coefficients <span class="math inline">\(x,y\)</span> such that <span
 class="math display">\[xa + yn = 1,\]</span> then <span
 class="math inline">\(x \equiv a^{-1} \pmod{n}\)</span>.</li>
 </ul>
-<!-- ## Extended Euclidean algorithm example
-
-* From before, to find  $\gcd(710,310)$ we performed the following integer divisions.
-* $710 = 2 \cdot 310 + 90$ so $\gcd(710,310) = \gcd(310,90)$,
-* $310 = 3 \cdot 90 + 40$ so $\gcd(310,90) = \gcd(90,40)$,
-* $90 = 2 \cdot 40 + 10$ so $\gcd(90,40) = \gcd(40,10)$,
-* $40 = 4 \cdot 10 + 0$ so $\gcd(40,10) = \gcd(10,0)=10$.
-
-To obtain a pair $x,y$ that satisfy $x \cdot 710 + y \cdot 310 = 10$, we perform the following manipulations.
-
-$\begin{align*}
-4 & 7 \\
-5 & 6
-\end{align*}$ -->
+</section>
+<section id="extended-euclidean-algorithm-example" class="slide level2">
+<h2>Extended Euclidean algorithm example</h2>
+<ul>
+<li>From before, to find <span
+class="math inline">\(\gcd(710,310)\)</span> we performed the following
+integer divisions.</li>
+<li><span class="math inline">\(710 = 2 \cdot 310 + 90\)</span></li>
+<li><span class="math inline">\(310 = 3 \cdot 90 + 40\)</span></li>
+<li><span class="math inline">\(90 = 2 \cdot 40 + 10\)</span></li>
+<li><span class="math inline">\(40 = 4 \cdot 10 + 0\)</span></li>
+</ul>
+<p>To obtain a pair <span class="math inline">\(x,y\)</span> that
+satisfy <span class="math inline">\(x \cdot 710 + y \cdot 310 =
+10\)</span>, we perform the following manipulations.</p>
+<ul>
+<li><span class="math inline">\(10 = 90 - 2 \cdot 40\)</span>,
+rearranging the second last division</li>
+<li><span class="math inline">\(10 = 90 - 2 \cdot(310 - 3 \cdot
+90)\)</span>, replacing <span class="math inline">\(40\)</span> with a
+rearrangment of the previous division</li>
+<li><span class="math inline">\(10 = -2 \cdot 310 + 7 \cdot
+90\)</span></li>
+</ul>
+<p>In the last line we have expanded out the bracket, now we have <span
+class="math inline">\(10\)</span> as a linear combination of <span
+class="math inline">\(310\)</span> and <span
+class="math inline">\(90\)</span>. Continue workign backwards through
+the list of integer divisions from the Euclidean algorithm to get</p>
+<ul>
+<li><span class="math inline">\(10 = -2 \cdot 310 + 7 \cdot (710 -
+2\cdot 310)\)</span>, replacing the <span
+class="math inline">\(90\)</span> using the first equation</li>
+<li><span class="math inline">\(10 = 7 \cdot 710 -16 \cdot 310\)</span>,
+expanding out the bracket</li>
+</ul>
+<p>We finally have what we want, the pair of coefficients, namely <span
+class="math inline">\(7\)</span> and <span
+class="math inline">\(-16\)</span>, that give a linear combination of
+<span class="math inline">\(710\)</span> and <span
+class="math inline">\(310\)</span> that is equal to their gcd.</p>
+<ul>
+<li><span class="math inline">\(\gcd(710,310) = 10 = 7 \cdot 710 -16
+\cdot 310\)</span></li>
+</ul>
 <!-- ## Prime numbers
 
 ## Fermat's Little Theorem

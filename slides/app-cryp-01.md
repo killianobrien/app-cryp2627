@@ -262,20 +262,28 @@ $$ xa + yb = d.$$
 $$xa + yn = 1,$$
 then $x \equiv a^{-1} \pmod{n}$.
 
-<!-- ## Extended Euclidean algorithm example
+## Extended Euclidean algorithm example
 
 * From before, to find  $\gcd(710,310)$ we performed the following integer divisions.
-* $710 = 2 \cdot 310 + 90$ so $\gcd(710,310) = \gcd(310,90)$,
-* $310 = 3 \cdot 90 + 40$ so $\gcd(310,90) = \gcd(90,40)$,
-* $90 = 2 \cdot 40 + 10$ so $\gcd(90,40) = \gcd(40,10)$,
-* $40 = 4 \cdot 10 + 0$ so $\gcd(40,10) = \gcd(10,0)=10$.
+* $710 = 2 \cdot 310 + 90$ 
+* $310 = 3 \cdot 90 + 40$ 
+* $90 = 2 \cdot 40 + 10$ 
+* $40 = 4 \cdot 10 + 0$ 
 
 To obtain a pair $x,y$ that satisfy $x \cdot 710 + y \cdot 310 = 10$, we perform the following manipulations.
 
-$\begin{align*}
-4 & 7 \\
-5 & 6
-\end{align*}$ -->
+* $10 = 90 - 2 \cdot 40$, rearranging the second last division
+* $10 = 90 - 2 \cdot(310 - 3 \cdot 90)$, replacing $40$ with a rearrangment of the previous division
+* $10 = -2 \cdot 310 + 7 \cdot 90$
+
+In the last line we have expanded out the bracket, now we have $10$ as a linear combination of $310$ and $90$. Continue workign backwards through the list of integer divisions from the Euclidean algorithm to get 
+
+* $10 = -2 \cdot 310 + 7 \cdot (710 - 2\cdot 310)$, replacing the $90$ using the first equation
+* $10 = 7 \cdot 710 -16 \cdot 310$, expanding out the bracket
+
+We finally have what we want, the pair of coefficients, namely $7$ and $-16$, that give a linear combination of $710$ and $310$ that is equal to their gcd.
+
+* $\gcd(710,310) = 10 = 7 \cdot 710 -16 \cdot 310$
 
 
 <!-- ## Prime numbers
