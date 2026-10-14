@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="author" content="Killian O’Brien">
-  <meta name="author" content="6G6Z0024 Applied Cryptography 2024/25">
+  <meta name="author" content="6G6Z0024 Applied Cryptography 2026/27">
   <title>Introduction to Number Theory</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,10 +15,16 @@
     .reveal .sourceCode {  /* see #7635 */
       overflow: visible;
     }
-    code{white-space: pre-wrap;}
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     /* The extra [class] is a hack that increases specificity enough to
        override a similar rule in reveal.js */
@@ -31,6 +37,9 @@
     }
   </style>
   <link rel="stylesheet" href="../reveal.js2/dist/theme/killian.css" id="theme">
+  <script src="https://sagecell.sagemath.org/static/embedded_sagecell.js"></script>
+  <script>sagecell.makeSagecell({"inputLocation": ".sage"});</script>
+  <p><link rel="stylesheet" type="text/css" href="https://sagecell.sagemath.org/static/sagecell_embed.css"></p>
 </head>
 <body>
   <div class="reveal">
@@ -40,8 +49,8 @@
 5%" data-background-repeat="no-repeat" data-background-size="18%">
   <h1 class="title">Introduction to Number Theory</h1>
   <p class="author">Killian O’Brien</p>
-  <p class="author">6G6Z0024 Applied Cryptography 2024/25</p>
-  <p class="date">Lecture Week 02 – Mon 06 October 2025</p>
+  <p class="author">6G6Z0024 Applied Cryptography 2026/27</p>
+  <p class="date">Lecture Week 02 – Wed 15 Oct 2026</p>
 </section>
 
 <section id="introduction-to-the-unit" class="slide level2">
@@ -56,7 +65,7 @@ See Moodle for contact details.</p></li>
 <li><p>Assessment is 100% coursework. A portfolio of exercises.</p></li>
 <li><p>Timetable</p></li>
 <li><p>Let’s look at the <a
-href="https://moodle.mmu.ac.uk/course/view.php?id=194955"
+href="https://moodle.mmu.ac.uk/course/view.php?id=205570"
 target="_blank">Moodle</a> page for the unit.</p></li>
 </ul>
 </section>
@@ -496,6 +505,51 @@ class="math display">\[xa + yn = 1,\]</span> then <span
 class="math inline">\(x \equiv a^{-1} \pmod{n}\)</span>.</li>
 </ul>
 </section>
+<section id="extended-euclidean-algorithm-example" class="slide level2">
+<h2>Extended Euclidean algorithm example</h2>
+<ul>
+<li>From before, to find <span
+class="math inline">\(\gcd(710,310)\)</span> we performed the following
+integer divisions.</li>
+<li><span class="math inline">\(710 = 2 \cdot 310 + 90\)</span></li>
+<li><span class="math inline">\(310 = 3 \cdot 90 + 40\)</span></li>
+<li><span class="math inline">\(90 = 2 \cdot 40 + 10\)</span></li>
+<li><span class="math inline">\(40 = 4 \cdot 10 + 0\)</span></li>
+</ul>
+<p>To obtain a pair <span class="math inline">\(x,y\)</span> that
+satisfy <span class="math inline">\(x \cdot 710 + y \cdot 310 =
+10\)</span>, we perform the following manipulations.</p>
+<ul>
+<li><span class="math inline">\(10 = 90 - 2 \cdot 40\)</span>,
+rearranging the second last division</li>
+<li><span class="math inline">\(10 = 90 - 2 \cdot(310 - 3 \cdot
+90)\)</span>, replacing <span class="math inline">\(40\)</span> with a
+rearrangment of the previous division</li>
+<li><span class="math inline">\(10 = -2 \cdot 310 + 7 \cdot
+90\)</span></li>
+</ul>
+<p>In the last line we have expanded out the bracket, now we have <span
+class="math inline">\(10\)</span> as a linear combination of <span
+class="math inline">\(310\)</span> and <span
+class="math inline">\(90\)</span>. Continue workign backwards through
+the list of integer divisions from the Euclidean algorithm to get</p>
+<ul>
+<li><span class="math inline">\(10 = -2 \cdot 310 + 7 \cdot (710 -
+2\cdot 310)\)</span>, replacing the <span
+class="math inline">\(90\)</span> using the first equation</li>
+<li><span class="math inline">\(10 = 7 \cdot 710 -16 \cdot 310\)</span>,
+expanding out the bracket</li>
+</ul>
+<p>We finally have what we want, the pair of coefficients, namely <span
+class="math inline">\(7\)</span> and <span
+class="math inline">\(-16\)</span>, that give a linear combination of
+<span class="math inline">\(710\)</span> and <span
+class="math inline">\(310\)</span> that is equal to their gcd.</p>
+<ul>
+<li><span class="math inline">\(\gcd(710,310) = 10 = 7 \cdot 710 -16
+\cdot 310\)</span></li>
+</ul>
+</section>
 <section id="prime-numbers" class="slide level2">
 <h2>Prime numbers</h2>
 <p>Of central importance in cryptography, and of great interest to
@@ -547,7 +601,7 @@ argument.</li>
 <li><span class="math inline">\(91 = 7 \cdot 13\)</span></li>
 <li><span class="math inline">\(3600 = 2^4 \cdot 3^2 \cdot
 5^2\)</span></li>
-<li><span class="math inline">\(1101 = 7 \cdot 11^2 \cdot
+<li><span class="math inline">\(11011 = 7 \cdot 11^2 \cdot
 13\)</span></li>
 </ul>
 </section>
@@ -655,6 +709,24 @@ p_1^{a_1-1}\cdot (p_1 - 1) \cdot p_2^{a_2 - 1}\cdot(p_2 - 1) \cdot \dots
 <p><strong>Example</strong> <span class="math display">\[ \phi(35) =
 \phi(5 \cdot 7) = 5^0 \cdot 4 \cdot 7^0 \cdot 6 = 4 \cdot 6 = 24.
 \]</span></p>
+<p><span class="math display">\[\phi(11011) = \phi(7 \cdot 11^2 \cdot
+13)
+= 7^0 \cdot (7-1) \cdot 11 \cdot (11 - 1) \cdot 13^0 \cdot (13 - 1) = 6
+\cdot 11 \cdot 10 \cdot 12 = 7920\]</span></p>
+</section>
+<section id="checking" class="slide level2">
+<h2>Checking</h2>
+<div class="sage" width="80%">
+<script type="text/x-sage">
+    import sympy as sp
+n = 11011
+L = [x for x in range(n) if sp.gcd(x,n)==1]
+
+print(sp.factorint(n))
+print(len(L))
+print(sp.totient(n))
+  </script>
+</div>
 </section>
 <section id="eulers-theorem" class="slide level2">
 <h2>Euler’s theorem</h2>
@@ -692,6 +764,23 @@ Remember <span class="math inline">\(\phi(35) = 24\)</span>.</li>
 \pmod{35}\)</span>.</li>
 </ul>
 <!-- ## Primality testing -->
+</section>
+<section id="suggested-reading" class="slide level2">
+<h2>Suggested reading</h2>
+<ul>
+<li><p>During the week, read up on the following sections of Chapter 2
+from Stallings.</p>
+<ul>
+<li>Testing for Primality</li>
+<li>Discrete Logarithms</li>
+</ul></li>
+<li><p>Discrete logarithms will be needed for public key encryption. I
+will cover it then also.</p></li>
+<li><p>A couple of appendix slides follow on the Chinese Remainder
+Theorem, also discussed in Chapter 2 of Stallings.</p></li>
+<li><p>Next week, our first encryption system, the <em>Data Encryption
+Standard</em> (DES).</p></li>
+</ul>
 </section>
 <section id="the-chinese-remainder-theorem" class="slide level2">
 <h2>The Chinese Remainder Theorem</h2>
@@ -762,22 +851,7 @@ class="math inline">\(\mathbb{Z}_M\)</span> can be achived by
 corresepoding operations on elements of <span
 class="math inline">\(\mathbb{Z}_{m_1} \times \mathbb{Z}_{m_2} \times
 \dots \times \mathbb{Z}_{m_k}\)</span>.</li>
-<li>We will work with examples of this in the today’s lab.</li>
-</ul>
-</section>
-<section id="suggested-reading" class="slide level2">
-<h2>Suggested reading</h2>
-<ul>
-<li><p>During the week, read up on the following sections of Chapter 2
-from Stallings.</p>
-<ul>
-<li>Testing for Primality</li>
-<li>Discrete Logarithms</li>
-</ul></li>
-<li><p>Discrete logarithms will be needed for public key encryption. I
-will cover it then also.</p></li>
-<li><p>Next week, our first encryption system, the <em>Data Encryption
-Standard</em> (DES).</p></li>
+<li>We will work with examples of this in the this week’s lab.</li>
 </ul>
 <!-- ## Exponentiation and discrete logarithms -->
 </section>
@@ -948,7 +1022,7 @@ Standard</em> (DES).</p></li>
         margin: 5.0e-2,
 
         math: {
-          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js',
           config: 'TeX-AMS_HTML-full',
           tex2jax: {
             inlineMath: [['\\(','\\)']],

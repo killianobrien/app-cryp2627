@@ -2,8 +2,8 @@
 title: "Introduction to Number Theory"
 author:
 - Killian O'Brien
-- 6G6Z0024 Applied Cryptography 2025/26
-date: Lecture Week 02 -- Mon 06 October 2025
+- 6G6Z0024 Applied Cryptography 2026/27
+date: Lecture Week 02 -- Wed 15 Oct 2026
 transition: fade
 theme: killian
 width: 1920
@@ -17,7 +17,14 @@ title-slide-attributes:
     data-background-size: 18%
     data-background-repeat: no-repeat
     data-background-position: 95% 5%	
+header-includes:
+    - |
+        <script src="https://sagecell.sagemath.org/static/embedded_sagecell.js"></script>
+        <script>sagecell.makeSagecell({"inputLocation": ".sage"});</script>
+        <link rel="stylesheet" type="text/css" href="https://sagecell.sagemath.org/static/sagecell_embed.css">
 ---
+
+
 
 ## Introduction to the unit
 
@@ -29,7 +36,7 @@ title-slide-attributes:
 
 * Timetable
 
-* Let's look at the [Moodle](https://moodle.mmu.ac.uk/course/view.php?id=194955){target="_blank"} page for the unit.
+* Let's look at the [Moodle](https://moodle.mmu.ac.uk/course/view.php?id=205570){target="_blank"} page for the unit.
 
 ## Introduction to Number Theory
 
@@ -262,6 +269,29 @@ $$ xa + yb = d.$$
 $$xa + yn = 1,$$
 then $x \equiv a^{-1} \pmod{n}$.
 
+## Extended Euclidean algorithm example
+
+* From before, to find  $\gcd(710,310)$ we performed the following integer divisions.
+* $710 = 2 \cdot 310 + 90$ 
+* $310 = 3 \cdot 90 + 40$ 
+* $90 = 2 \cdot 40 + 10$ 
+* $40 = 4 \cdot 10 + 0$ 
+
+To obtain a pair $x,y$ that satisfy $x \cdot 710 + y \cdot 310 = 10$, we perform the following manipulations.
+
+* $10 = 90 - 2 \cdot 40$, rearranging the second last division
+* $10 = 90 - 2 \cdot(310 - 3 \cdot 90)$, replacing $40$ with a rearrangment of the previous division
+* $10 = -2 \cdot 310 + 7 \cdot 90$
+
+In the last line we have expanded out the bracket, now we have $10$ as a linear combination of $310$ and $90$. Continue workign backwards through the list of integer divisions from the Euclidean algorithm to get 
+
+* $10 = -2 \cdot 310 + 7 \cdot (710 - 2\cdot 310)$, replacing the $90$ using the first equation
+* $10 = 7 \cdot 710 -16 \cdot 310$, expanding out the bracket
+
+We finally have what we want, the pair of coefficients, namely $7$ and $-16$, that give a linear combination of $710$ and $310$ that is equal to their gcd.
+
+* $\gcd(710,310) = 10 = 7 \cdot 710 -16 \cdot 310$
+
 ## Prime numbers
 
 Of central importance in cryptography, and of great interest to mathematicians, are the *prime integers*.
@@ -292,7 +322,7 @@ $$n = \prod_{i=1}^r p_i^{a_i}.$$
 
 * $91 = 7 \cdot 13$
 * $3600 = 2^4 \cdot 3^2 \cdot 5^2$
-* $1101 = 7 \cdot 11^2 \cdot 13$
+* $11011 = 7 \cdot 11^2 \cdot 13$
 
 ## Fermat's Little Theorem
 
@@ -363,6 +393,23 @@ $$ \phi(n) = \prod_{i=1}^r p_i^{a_i - 1}(p_i - 1) = p_1^{a_1-1}\cdot (p_1 - 1) \
 **Example**
 $$ \phi(35) = \phi(5 \cdot 7) = 5^0 \cdot 4 \cdot 7^0 \cdot 6 = 4 \cdot 6 = 24. $$
 
+$$\phi(11011) = \phi(7 \cdot 11^2 \cdot 13) 
+= 7^0 \cdot (7-1) \cdot 11 \cdot (11 - 1) \cdot 13^0 \cdot (13 - 1) = 6 \cdot 11 \cdot 10 \cdot 12 = 7920$$
+
+## Checking
+
+<div width="80%" class="sage">
+  <script type="text/x-sage">
+    import sympy as sp
+n = 11011
+L = [x for x in range(n) if sp.gcd(x,n)==1]
+
+print(sp.factorint(n))
+print(len(L))
+print(sp.totient(n))
+  </script>
+</div>
+
 ## Euler's theorem
 
 Finally, we can now state Euler's theorem, which is a generalization of Fermat's Little Theorem
@@ -385,6 +432,20 @@ $$a^b = a^{q \cdot \phi(n) + r} = a^{q \cdot \phi(n)} \cdot a^r = \left ( a^{\ph
 * So $a^{23458973249848} \equiv a^{16} \pmod{35}$.
 
 <!-- ## Primality testing -->
+
+
+
+## Suggested reading
+
+* During the week, read up on the following sections of Chapter 2 from Stallings. 
+    - Testing for Primality
+    - Discrete Logarithms
+
+
+* Discrete logarithms will be needed for public key encryption. I will cover it then also. 
+* A couple of appendix slides follow on the Chinese Remainder Theorem, also discussed in Chapter 2 of Stallings. 
+
+* Next week, our first encryption system, the *Data Encryption Standard* (DES). 
 
 ## The Chinese Remainder Theorem
 
@@ -414,18 +475,6 @@ i.e. reduct $x$ modulo $m_i$ for the $i^{th}$-component of the $k$-tuple.
 $$a = \sum_{i=1}^k a_i \cdot M_i \cdot M_i^{-1} \pmod{M}.$$
 * These two maps described above are *inverses* of one another. 
 * Arithmetic operations on elements of $\mathbb{Z}_M$ can be achived by corresepoding operations on elements of $\mathbb{Z}_{m_1} \times \mathbb{Z}_{m_2} \times \dots \times \mathbb{Z}_{m_k}$.
-* We will work with examples of this in the this week's lab. 
-
-## Suggested reading
-
-* During the week, read up on the following sections of Chapter 2 from Stallings. 
-    - Testing for Primality
-    - Discrete Logarithms
-
-
-* Discrete logarithms will be needed for public key encryption. I will cover it then also. 
-
-* Next week, our first encryption system, the *Data Encryption Standard* (DES). 
-
+* We will work with examples of this in the this week's lab.
 
 <!-- ## Exponentiation and discrete logarithms -->
