@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="author" content="Killian O’Brien">
-  <meta name="author" content="6G6Z0024 Applied Cryptography 2025/26">
+  <meta name="author" content="6G6Z0024 Applied Cryptography 2026/27">
   <title>Symmetric ciphers and the Data Encryption Standard (DES)</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,10 +15,16 @@
     .reveal .sourceCode {  /* see #7635 */
       overflow: visible;
     }
-    code{white-space: pre-wrap;}
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     /* The extra [class] is a hack that increases specificity enough to
        override a similar rule in reveal.js */
@@ -41,25 +47,28 @@
   <h1 class="title">Symmetric ciphers and the Data Encryption Standard
 (DES)</h1>
   <p class="author">Killian O’Brien</p>
-  <p class="author">6G6Z0024 Applied Cryptography 2025/26</p>
-  <p class="date">Lecture Week 03 – Mon 13 October 2025</p>
+  <p class="author">6G6Z0024 Applied Cryptography 2026/27</p>
+  <p class="date">Lecture Week 03 – Wed 21st October 2026</p>
 </section>
 
 <section id="introduction-to-the-unit" class="slide level2">
 <h2>Introduction to the unit</h2>
 <ul>
-<li><p>Teaching team: Dr Killian O’Brien
+<li>Teaching team: Dr Killian O’Brien
 <img src="./images/mee.jpg" alt="Smiley face" style="vertical-align:middle;padding:3px;width:100px;">
 and Dr Safiullah Khan
 <img src="../safi.jpg" alt="Smiley face" style="vertical-align:middle;padding:3px;width:100px;">.
-See Moodle for contact details.</p></li>
-<li><p>6G6Z0024 Applied Cryptography (15 credits)</p></li>
-<li><p>Assessment is 100% coursework. A portfolio of exercises.</p></li>
-<li><p>Timetable</p></li>
-<li><p>Let’s look at the <a
-href="https://moodle.mmu.ac.uk/course/view.php?id=194955"
-target="_blank">Moodle</a> page for the unit.</p></li>
-<li><p>Reading for this topic</p>
+See Moodle for contact details.</li>
+</ul>
+<!-- * 6G6Z0024 Applied Cryptography (15 credits)
+
+* Assessment is 100% coursework. A portfolio of exercises. 
+
+* Timetable
+
+* Let's look at the [Moodle](https://moodle.mmu.ac.uk/course/view.php?id=194955){target="_blank"} page for the unit. -->
+<ul>
+<li>Reading for this topic
 <ul>
 <li><p><a href="https://mmu.on.worldcat.org/oclc/1334132058" target="_blank">Stallings,
 Chapter 3, Just Section 3.1: Symmetric Cipher Model</a></p></li>
@@ -581,7 +590,7 @@ ciphers in general.</li>
         margin: 5.0e-2,
 
         math: {
-          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js',
           config: 'TeX-AMS_HTML-full',
           tex2jax: {
             inlineMath: [['\\(','\\)']],
