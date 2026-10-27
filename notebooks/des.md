@@ -1,6 +1,6 @@
 ## Final output checkstrings for the DES questions
 
-You can find your check string on the line below your name.
+You can find your check string on the line below your name. This checkstring is the final 64 bit output string that is the correct output to the question DES.09, i.e. the concatenation of the strings L1 and R1.
 
 ~~~
 Annumh , Abass , 24777245 , 0000000011111111000000000011110100001010001001011001001110101110
