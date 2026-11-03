@@ -2,8 +2,8 @@
 title: "Finite fields for the Advanced Encryption Standard (AES)"
 author:
 - Killian O'Brien
-- 6G6Z0024 Applied Cryptography 2025/26
-date: Lecture Week 05 -- Mon 27 October 2025
+- 6G6Z0024 Applied Cryptography 2026/27
+date: Lecture Week 05 -- Wed 04 November 2026
 transition: fade
 theme: killian
 width: 1920
@@ -62,7 +62,7 @@ title-slide-attributes:
 
 ## Fields
 
-* Essentially, a field $(F,+, \cdot)$ is a system within which we can perform addition, subtraction, multiplication and division, without leaving the set $F$, and the usual proeprties we are familiar with, from $\mathbb{R}$ say, hold true. 
+* Essentially, a field $(F,+, \cdot)$ is a system within which we can perform addition, subtraction, multiplication and division, without leaving the set $F$, and the usual properties we are familiar with, from $\mathbb{R}$ say, hold true. 
 * Subtraction and division are defined in terms of addition and multiplication as 
     - $a - b = a + (-b)$
     - $a/b = a \cdot b^{-1}$

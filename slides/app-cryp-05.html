@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="author" content="Killian O’Brien">
-  <meta name="author" content="6G6Z0024 Applied Cryptography 2025/26">
+  <meta name="author" content="6G6Z0024 Applied Cryptography 2026/27">
   <title>Finite fields for the Advanced Encryption Standard (AES)</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,10 +15,16 @@
     .reveal .sourceCode {  /* see #7635 */
       overflow: visible;
     }
-    code{white-space: pre-wrap;}
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     /* The extra [class] is a hack that increases specificity enough to
        override a similar rule in reveal.js */
@@ -41,8 +47,8 @@
   <h1 class="title">Finite fields for the Advanced Encryption Standard
 (AES)</h1>
   <p class="author">Killian O’Brien</p>
-  <p class="author">6G6Z0024 Applied Cryptography 2025/26</p>
-  <p class="date">Lecture Week 05 – Mon 27 October 2025</p>
+  <p class="author">6G6Z0024 Applied Cryptography 2026/27</p>
+  <p class="date">Lecture Week 05 – Wed 04 November 2026</p>
 </section>
 
 <section id="introduction" class="slide level2">
@@ -167,7 +173,7 @@ satisfying (A1) - (A4) and (M1)-(M7) is called a
 <li>Essentially, a field <span class="math inline">\((F,+,
 \cdot)\)</span> is a system within which we can perform addition,
 subtraction, multiplication and division, without leaving the set <span
-class="math inline">\(F\)</span>, and the usual proeprties we are
+class="math inline">\(F\)</span>, and the usual properties we are
 familiar with, from <span class="math inline">\(\mathbb{R}\)</span> say,
 hold true.</li>
 <li>Subtraction and division are defined in terms of addition and
@@ -232,7 +238,7 @@ class="math display">\[ ax + py = \gcd(a,p) = 1.\]</span></li>
 <li>Then reducing this equation modulo <span
 class="math inline">\(p\)</span> gives <span class="math display">\[ax
 \equiv 1 \pmod{p},\]</span> so <span class="math inline">\(a^{-1} = (x
-\, \,\text{mod} \,\, p)\)</span>.</li>
+\, \,\text{mod} \,\,  p)\)</span>.</li>
 </ul></li>
 </ul>
 </section>
@@ -669,7 +675,7 @@ very fast. See Stallings for details.</li>
         margin: 5.0e-2,
 
         math: {
-          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js',
           config: 'TeX-AMS_HTML-full',
           tex2jax: {
             inlineMath: [['\\(','\\)']],
