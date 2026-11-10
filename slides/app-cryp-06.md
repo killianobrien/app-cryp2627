@@ -55,7 +55,7 @@ of degree $n-1$ or less.
     - $N=12$ for 192 bit key.
     - $N=14$ for 256 bit key.
 * The key passes through a *key expansion* transformation to provide $N+1$ sub-keys to be used in the initial transformation and $N$ rounds. 
-* Each sub-key consists for four 4-byte **words**, which form the columns of the **round key matrix**.
+* Each sub-key consists of four 4-byte **words**, which form the columns of the **round key matrix**.
 
 ## AES detail
 
