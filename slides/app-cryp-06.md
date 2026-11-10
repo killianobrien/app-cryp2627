@@ -2,8 +2,8 @@
 title: "Advanced Encryption Standard (AES)"
 author:
 - Killian O'Brien
-- 6G6Z0024 Applied Cryptography 2025/26
-date: Lecture Week 06 --  Mon 02 November 2025
+- 6G6Z0024 Applied Cryptography 2026/27
+date: Lecture Week 06 --  Wed 11 November 2026
 transition: fade
 theme: killian
 width: 1920
