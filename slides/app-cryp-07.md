@@ -2,8 +2,8 @@
 title: "Public Key Cryptography"
 author:
 - Killian O'Brien
-- 6G6Z0024 Applied Cryptography 2025/26
-date: Lecture Week 07 -- Mon 10 November 2025 
+- 6G6Z0024 Applied Cryptography 2026/27
+date: Lecture Week 07 -- Wed 18 November 2026 
 transition: fade
 theme: killian
 width: 1920
