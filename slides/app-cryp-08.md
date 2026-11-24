@@ -3,7 +3,7 @@ title: "Public Key Cryptography"
 author:
 - Killian O'Brien
 - 6G6Z0024 Applied Cryptography 2026/27
-date: Lecture Week 08 -- Wed 18 November 2026
+date: Lecture Week 08 -- Wed 25 November 2026
 transition: fade
 theme: killian
 width: 1920
@@ -53,6 +53,13 @@ In this lecture we shall look at
     - Computer scientists would usually mean $\log_2$,
     - Mathematicians would usually mean $\log_e$, the *natural logarithm*,
     - Engineers might usually mean $\log_{10}$.
+
+## Exponentials in modular arithmetic
+
+* Exponentials work in a similar way in modular arithmetic, except we interpret things *modulo* the given modulus. 
+* For a positive integer $b$, the exponential $a^{-b} \pmod{n}$ would mean 
+$$a^{-b} = (a^{-1})^b \pmod{n},$$
+so this would only be defined if the element $a$ had a multiplicative inverse, $a^{-1}$, modulo $n$. 
 
 ## What are discrete logarithms?
 

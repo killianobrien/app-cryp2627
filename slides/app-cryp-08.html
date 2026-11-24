@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="generator" content="pandoc">
   <meta name="author" content="Killian O’Brien">
-  <meta name="author" content="6G6Z0024 Applied Cryptography 2025/26">
+  <meta name="author" content="6G6Z0024 Applied Cryptography 2026/27">
   <title>Public Key Cryptography</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -18,10 +18,13 @@
     /* Default styles provided by pandoc.
     ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
     */
-    code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     /* The extra [class] is a hack that increases specificity enough to
        override a similar rule in reveal.js */
@@ -43,8 +46,8 @@
 5%" data-background-repeat="no-repeat" data-background-size="18%">
   <h1 class="title">Public Key Cryptography</h1>
   <p class="author">Killian O’Brien</p>
-  <p class="author">6G6Z0024 Applied Cryptography 2025/26</p>
-  <p class="date">Lecture Week 08 – Mon 17 November 2025</p>
+  <p class="author">6G6Z0024 Applied Cryptography 2026/27</p>
+  <p class="date">Lecture Week 08 – Wed 25 November 2026</p>
 </section>
 
 <section id="introduction" class="slide level2">
@@ -119,6 +122,20 @@ logarithm</em>,</li>
 <li>Engineers might usually mean <span
 class="math inline">\(\log_{10}\)</span>.</li>
 </ul></li>
+</ul>
+</section>
+<section id="exponentials-in-modular-arithmetic" class="slide level2">
+<h2>Exponentials in modular arithmetic</h2>
+<ul>
+<li>Exponentials work in a similar way in modular arithmetic, except we
+interpret things <em>modulo</em> the given modulus.</li>
+<li>For a positive integer <span class="math inline">\(b\)</span>, the
+exponential <span class="math inline">\(a^{-b} \pmod{n}\)</span> would
+mean <span class="math display">\[a^{-b} = (a^{-1})^b \pmod{n},\]</span>
+so this would only be defined if the element <span
+class="math inline">\(a\)</span> had a multiplicative inverse, <span
+class="math inline">\(a^{-1}\)</span>, modulo <span
+class="math inline">\(n\)</span>.</li>
 </ul>
 </section>
 <section id="what-are-discrete-logarithms" class="slide level2">
@@ -390,7 +407,7 @@ q).\]</span></li>
         margin: 5.0e-2,
 
         math: {
-          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js',
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js',
           config: 'TeX-AMS_HTML-full',
           tex2jax: {
             inlineMath: [['\\(','\\)']],
